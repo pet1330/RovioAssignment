@@ -1,0 +1,49 @@
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\Workshop 2 - Forms.exe
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\Workshop 2 - Forms.pdb
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.dll
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.dll
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.xml
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop_2___Forms.ImageViewer.resources
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop_2___Forms.MainForm.resources
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop_2___Forms.Properties.Resources.resources
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\ResGen.read.1.tlog
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\ResGen.write.1.tlog
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.exe
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.pdb
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.dll
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.IPPrototyper.dll
+C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.xml
+F:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.exe
+F:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.pdb
+F:\Workshop 2\Workshop 2 - Forms\bin\Debug\Workshop 2 - Forms.exe
+F:\Workshop 2\Workshop 2 - Forms\bin\Debug\Workshop 2 - Forms.pdb
+F:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.dll
+F:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.dll
+F:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.dll
+F:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.IPPrototyper.dll
+F:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.xml
+F:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.xml
+F:\Workshop 2\Workshop 2 - Forms\obj\Debug\ResolveAssemblyReference.cache
+F:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop_2___Forms.ImageViewer.resources
+F:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop_2___Forms.MainForm.resources
+F:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop_2___Forms.Properties.Resources.resources
+F:\Workshop 2\Workshop 2 - Forms\obj\Debug\ResGen.read.1.tlog
+F:\Workshop 2\Workshop 2 - Forms\obj\Debug\ResGen.write.1.tlog
+E:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.exe
+E:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.pdb
+E:\Workshop 2\Workshop 2 - Forms\bin\Debug\Workshop 2 - Forms.exe
+E:\Workshop 2\Workshop 2 - Forms\bin\Debug\Workshop 2 - Forms.pdb
+E:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.dll
+E:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.dll
+E:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.dll
+E:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.IPPrototyper.dll
+E:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.xml
+E:\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.xml
+E:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.csprojResolveAssemblyReference.cache
+E:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop_2___Forms.ImageViewer.resources
+E:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop_2___Forms.MainForm.resources
+E:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop_2___Forms.Properties.Resources.resources
+E:\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.csproj.GenerateResource.Cache
+C:\Users\pete\Dropbox\Lincoln\Year 3\Computer Vision & Robotics\Simester B\Assignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.exe
+C:\Users\pete\Dropbox\Lincoln\Year 3\Computer Vision & Robotics\Simester B\Assignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.pdb
