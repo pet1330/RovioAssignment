@@ -5,51 +5,36 @@ using System.Text;
 using System.Threading;
 using System.Drawing;
 using System.Collections.Concurrent;
+using AForge;
+using AForge.Imaging.Filters;
 
 namespace Rovio
 {
     class ProcessImage
     {
         //Vars
-        public BlockingCollection<Bitmap> queue { get; set; }
-
-        FeatureExtracting fe;
+        public static BlockingCollection<Bitmap> queue = new BlockingCollection<Bitmap>(10);
+        public static AutoResetEvent Notifier = new AutoResetEvent(false);
         //constructor
-        public ProcessImage(FeatureExtracting _fe) 
-        {
-            fe = _fe;
-            queue = new BlockingCollection<Bitmap>(10);
-        }
-
+        public ProcessImage(){}
 
         //functions
         public void process() 
         {
             while (true)
             {
-                while (queue.Count>0)
+                ProcessImage.Notifier.WaitOne();
+                foreach (Bitmap image in queue.GetConsumingEnumerable())//it will block here automatically waiting from new items to be added and it will not take cpu down 
                 {
-                    Bitmap image =  queue.Take();
-                    AForge.Imaging.Filters.ColorFiltering test = new AForge.Imaging.Filters.ColorFiltering();
-                    test.Red = new AForge.IntRange(40, 120);
-                    test.Green = new AForge.IntRange(40, 120);
-                    test.Blue = new AForge.IntRange(40, 120);
-                    test.ApplyInPlace(image);
-                    fe.add(image);
-                    
+                    ColorFiltering filter = new ColorFiltering();
+                    filter.Red = new IntRange(100, 255);
+                    filter.Green = new IntRange(0, 75);
+                    filter.Blue = new IntRange(0, 75);
+                    filter.ApplyInPlace(image);
+                    FeatureExtracting.queue.Add(image);
+                    FeatureExtracting.Notifier.Set();
                 }
             }
         }
-
-        public void add(Bitmap im) 
-        {
-            queue.Add(im);
-        }
-
-        private Bitmap consume() 
-        {
-            return queue.Take();
-        }
-
     }
 }

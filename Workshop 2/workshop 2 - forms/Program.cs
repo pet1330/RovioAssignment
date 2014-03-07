@@ -7,14 +7,20 @@ namespace Rovio
 {
     static class Program
     {
+#if DEBUG
         public static MainForm mainForm;
+#endif
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-             mainForm = new MainForm();
+#if DEBUG
+            mainForm = new MainForm();
              Application.Run(mainForm);
+#else
+Application.Run(new MainForm());
+#endif
         }
     }
 }

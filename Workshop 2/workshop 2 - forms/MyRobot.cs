@@ -5,37 +5,33 @@ using System.Text;
 using System.Drawing;
 using AForge;
 using System.Threading;
+using System.Collections.Concurrent;
 
 namespace Rovio
 {
     class MyRobot : Robot
     {
 
-        private System.Threading.Thread imageProcessingThread { get; set; }
-        private System.Threading.Thread FeatureExtractionThread { get; set; }
-        private System.Threading.Thread ActionPlanningThread { get; set; }
-        private ProcessImage pi  { get; set; }
-        private FeatureExtracting fe { get; set; }
-        private ActionPlanning ap { get; set; }
+        public static BlockingCollection<Stats> queue = new BlockingCollection<Stats>(10);
+        public static AutoResetEvent Notifier = new AutoResetEvent(false);
 
         
-
         public MyRobot(string address, string user, string password)
             : base(address, user, password)
         {
 
-            ap = new ActionPlanning(this);
-            ActionPlanningThread = new Thread(new ThreadStart(ap.process));
-            ActionPlanningThread.IsBackground = true;
+            ActionPlanning ap = new ActionPlanning();
+            Thread ActionPlanningThread = new Thread(new ThreadStart(ap.process));
+             ActionPlanningThread.IsBackground = true;
             ActionPlanningThread.Start();
 
-            fe = new FeatureExtracting(ap);
-            FeatureExtractionThread = new Thread(new ThreadStart(fe.process));
+            FeatureExtracting fe = new FeatureExtracting();
+            Thread FeatureExtractionThread = new Thread(new ThreadStart(fe.process));
             FeatureExtractionThread.IsBackground = true;
             FeatureExtractionThread.Start();
 
-            pi = new ProcessImage(fe);
-            imageProcessingThread = new Thread(new ThreadStart(pi.process));
+            ProcessImage pi = new ProcessImage();
+            Thread imageProcessingThread = new Thread(new ThreadStart(pi.process));
             imageProcessingThread.IsBackground = true;
             imageProcessingThread.Start();
 
@@ -61,13 +57,14 @@ namespace Rovio
             //endless loop
             while (true)
             {
+              //  foreach (Stats instructions in MyRobot.queue.GetConsumingEnumerable())
+                //{
+                    
+               // }
+
                 //Bitmap image = this.Camera.Image;
-
-                pi.add(this.Camera.Image);
-                Bitmap t = this.Camera.Image;
-
-                //emit events
-                //SourceImage(t);
+                ProcessImage.queue.Add(this.Camera.Image);
+                ProcessImage.Notifier.Set();
             }
         }
     }

@@ -1,25 +1,21 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Drawing;
-using System.Collections.Concurrent;
 
 namespace Rovio
 {
     class FeatureExtracting
     {
                 //Vars
-        public BlockingCollection<Bitmap> queue { get; set; }
-        ActionPlanning ap;
+        public static BlockingCollection<Bitmap> queue = new BlockingCollection<Bitmap>(10);
+        public static AutoResetEvent Notifier = new AutoResetEvent(false);
 
         //constructor
-        public FeatureExtracting(ActionPlanning _ap) 
-        {
-            ap = _ap;
-            queue = new BlockingCollection<Bitmap>(10);
-        }
+        public FeatureExtracting(){}
 
 
         //functions
@@ -27,29 +23,21 @@ namespace Rovio
         {
             while (true)
             {
-                while (queue.Count > 0)
+                FeatureExtracting.Notifier.WaitOne();
+                ProcessImage.Notifier.WaitOne();
+                foreach (Bitmap image in queue.GetConsumingEnumerable())
                 {
-                    Bitmap image = queue.Take();
-
                     AForge.Imaging.BlobCounter bc = new AForge.Imaging.BlobCounter(image);
                     Rectangle[] r = bc.GetObjectsRectangles();
-                    FeatureStatistics a = new FeatureStatistics();
+                    Stats a = new Stats();
                     a.blobCount = r.Length;
-                    ap.add(a);
-                    Program.mainForm.pictureBox1.Image = image;
+                    ActionPlanning.queue.Add(a);
+                    ActionPlanning.Notifier.Set();
+#if DEBUG
+                    Program.mainForm.VideoViewer.Image = image;
+#endif
                 }
             }
         }
-
-        public void add(Bitmap im)
-        {
-            queue.Add(im);
-        }
-
-        private Bitmap consume()
-        {
-            return queue.Take();
-        }
-
     }
 }

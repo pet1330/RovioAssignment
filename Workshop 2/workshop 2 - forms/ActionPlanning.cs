@@ -11,39 +11,27 @@ namespace Rovio
     class ActionPlanning
     {
                 //Vars
-        public BlockingCollection<FeatureStatistics> queue { get; set; }
-        public MyRobot r { get; set; }
-        
+        public static BlockingCollection<Stats> queue = new BlockingCollection<Stats>(10);
+        public static AutoResetEvent Notifier = new AutoResetEvent(false);
 
         //constructor
-        public ActionPlanning(MyRobot _r) 
-        {
-            queue = new BlockingCollection<FeatureStatistics>(10);
-            r = _r;
-        }
-
+        public ActionPlanning(){}
 
         //functions
         public void process() 
         {
             while (true)
             {
-                while (queue.Count > 0)
+                ActionPlanning.Notifier.WaitOne();
+                ProcessImage.Notifier.WaitOne();
+                foreach (Stats stats in queue.GetConsumingEnumerable())//it will block here automatically waiting from new items to be added and it will not take cpu down 
                 {
-                    FeatureStatistics stats = queue.Take();
+                    Console.WriteLine(stats.blobCount);
+                    if (stats.blobCount > 20) 
+                    {
+                    }
                 }
             }
         }
-
-        public void add(FeatureStatistics im)
-        {
-            queue.Add(im);
-        }
-
-        private FeatureStatistics consume()
-        {
-            return queue.Take();
-        }
-
     }
 }

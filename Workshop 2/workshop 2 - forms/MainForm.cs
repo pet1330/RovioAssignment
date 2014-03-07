@@ -35,8 +35,8 @@ namespace Rovio
             robot_thread.Start();
 
 
-            pictureBox1.Location = new Point(0, 0);
-            pictureBox1.Size = this.ClientSize;
+            VideoViewer.Location = new Point(0, 0);
+            VideoViewer.Size = this.ClientSize;
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -47,7 +47,7 @@ namespace Rovio
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            pictureBox1.Size = this.ClientSize;
+            VideoViewer.Size = this.ClientSize;
         }
 
 
@@ -58,11 +58,11 @@ namespace Rovio
         //update the picture box content
         public void UpdateImage(Image image)
         {
-            pictureBox1.Image = image;
+            VideoViewer.Image = image;
             if (this.InvokeRequired)
                 this.Invoke(new MethodInvoker(delegate { UpdateImage(image); }));
             else
-                this.ClientSize = pictureBox1.Image.Size;
+                this.ClientSize = VideoViewer.Image.Size;
         }
 
         //===================================================================================================================================

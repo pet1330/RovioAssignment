@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Rovio
 {
-    class FeatureStatistics
+    class Stats
     {
         public int blobCount { get; set; }
 
 
 
-        public FeatureStatistics() 
+        public Stats() 
         {
             blobCount = 0;
         }
