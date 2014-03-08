@@ -23,12 +23,12 @@ namespace Rovio
             while (true)
             {
                 ActionPlanning.Notifier.WaitOne();
-                ProcessImage.Notifier.WaitOne();
                 foreach (Stats stats in queue.GetConsumingEnumerable())//it will block here automatically waiting from new items to be added and it will not take cpu down 
                 {
                     Console.WriteLine(stats.blobCount);
-                    if (stats.blobCount > 20) 
+                    if (stats.blobCount > 1)
                     {
+
                     }
                 }
             }

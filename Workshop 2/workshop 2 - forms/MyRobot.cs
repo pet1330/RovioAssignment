@@ -19,29 +19,18 @@ namespace Rovio
         public MyRobot(string address, string user, string password)
             : base(address, user, password)
         {
-
-            ActionPlanning ap = new ActionPlanning();
-            Thread ActionPlanningThread = new Thread(new ThreadStart(ap.process));
-             ActionPlanningThread.IsBackground = true;
+            Thread ActionPlanningThread = new Thread(new ThreadStart(new ActionPlanning().process));
+            ActionPlanningThread.IsBackground = true;
             ActionPlanningThread.Start();
 
-            FeatureExtracting fe = new FeatureExtracting();
-            Thread FeatureExtractionThread = new Thread(new ThreadStart(fe.process));
+            Thread FeatureExtractionThread = new Thread(new ThreadStart(new FeatureExtracting().process));
             FeatureExtractionThread.IsBackground = true;
             FeatureExtractionThread.Start();
 
-            ProcessImage pi = new ProcessImage();
-            Thread imageProcessingThread = new Thread(new ThreadStart(pi.process));
+            Thread imageProcessingThread = new Thread(new ThreadStart(new ProcessImage().process));
             imageProcessingThread.IsBackground = true;
             imageProcessingThread.Start();
-
-            
-
-
         }
-
-        public delegate void ImageReady(Image image);
-        public event ImageReady SourceImage;
 
         public void ProcessImages()
         {
@@ -51,20 +40,15 @@ namespace Rovio
             {
                 //simple way of getting feedback in the form mode
                 System.Windows.Forms.MessageBox.Show("Could not connect to the robot");
-                return;
+                Environment.Exit(1057);
             }
 
             //endless loop
             while (true)
             {
-              //  foreach (Stats instructions in MyRobot.queue.GetConsumingEnumerable())
-                //{
-                    
-               // }
-
-                //Bitmap image = this.Camera.Image;
                 ProcessImage.queue.Add(this.Camera.Image);
                 ProcessImage.Notifier.Set();
+
             }
         }
     }

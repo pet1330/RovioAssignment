@@ -22,14 +22,6 @@ namespace Rovio
         {
             //instantiate the robot object
             MyRobot ron = new MyRobot("http://10.82.0.33/", "user", "password");
-
-            //initilise the image view window
-            //ImageViewer source_view = new ImageViewer();
-            //source_view.Text = "Source";
-            Show();
-            //attach the robot event to the image update method
-            ron.SourceImage += UpdateImage;
-
             //create and start the robot thread: your own implementation in MyRobot class
             robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.ProcessImages));
             robot_thread.Start();

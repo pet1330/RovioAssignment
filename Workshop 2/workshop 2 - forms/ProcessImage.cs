@@ -31,6 +31,8 @@ namespace Rovio
                     filter.Green = new IntRange(0, 75);
                     filter.Blue = new IntRange(0, 75);
                     filter.ApplyInPlace(image);
+                    AForge.Imaging.Filters.Closing close = new AForge.Imaging.Filters.Closing();
+                    close.ApplyInPlace(image);
                     FeatureExtracting.queue.Add(image);
                     FeatureExtracting.Notifier.Set();
                 }
