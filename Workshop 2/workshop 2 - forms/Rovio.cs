@@ -2240,7 +2240,7 @@ namespace Rovio
         /// Rotate left.
         /// </summary>
         /// <param name="speed"></param>
-        public void RotateLeft(int speed) { robot.API.Movement.ManualDrive.StraightLeft(speed); }
+        public void RotateLeft(int speed) { robot.API.Movement.ManualDrive.RotateLeft(speed); }
 
         /// <summary>
         /// Rotate right.

@@ -1,0 +1,80 @@
+public void ProcessImages()
+        {
+            //check if we can receive responses from the robot
+            try { API.Movement.GetLibNSVersion(); } // a dummy request
+            catch (Exception)
+            {
+                //simple way of getting feedback in the form mode
+                System.Windows.Forms.MessageBox.Show("Could not connect to the robot");
+                Environment.Exit(1057);
+            }
+
+            //endless loop
+            while (true)
+            {
+
+                Bitmap image = this.Camera.Image;
+
+                ColorFiltering filter = new ColorFiltering();
+                filter.Red = new IntRange(100, 255);
+                filter.Green = new IntRange(0, 75);
+                filter.Blue = new IntRange(0, 75);
+                filter.ApplyInPlace(image);
+
+
+                AForge.Imaging.BlobCounter bc = new AForge.Imaging.BlobCounter(image);
+                bc.MinHeight = 14;
+                bc.MinWidth = 14;
+                Rectangle[] rects = bc.GetObjectsRectangles();
+                Rectangle biggest = new Rectangle(0, 0, 0, 0);
+                Graphics g = Graphics.FromImage(image);
+                double ratio = 0;
+
+                foreach (Rectangle r in rects)
+                {
+                    ratio = (r.Height + 1.0) / (r.Width + 1.0);
+                    if (biggest.Width * biggest.Height < r.Width * r.Height)
+                    {
+                        //check ratio
+                        if ((ratio < 1.1) && (ratio > 0.45))
+                        {
+                            if (r.Width * r.Height > 200)
+                            {
+                                biggest = r;
+                            }
+                        }
+                    }
+                }
+                int objectCeter = 0;
+                if (biggest.Width > 15)
+                {
+                    objectCeter = (((biggest.Width / 2) + biggest.X) - image.Width / 2);
+                }
+                g.DrawRectangle(new Pen(Color.Blue), biggest);
+                string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + objectCeter;
+                System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 8);
+                System.Drawing.SolidBrush drawBrush = new System.Drawing.SolidBrush(System.Drawing.Color.White);
+                float x = 10.0F;
+                float y = 10.0F;
+                System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
+                g.DrawString(drawString, drawFont, drawBrush, x, y, drawFormat);
+                drawFont.Dispose();
+                drawBrush.Dispose();
+                // Merge a = new Merge(image);
+                //Program.mainForm.VideoViewer.Image = a.Apply(this.Camera.Image);
+                Program.mainForm.VideoViewer.Image = image;
+                Console.WriteLine(rects.Length);
+
+                if (objectCeter < -40) 
+                {
+                    
+					this.Request("rev.cgi?Cmd=nav&action=18&drive=5&speed=4&angle=1");
+                    this.Request("rev.cgi?Cmd=nav&action=18&drive=0&speed=0");
+                }
+                else if (objectCeter > 40) 
+                {
+                    this.Request("rev.cgi?Cmd=nav&action=18&drive=6&speed=4&angle=1");
+                    this.Request("rev.cgi?Cmd=nav&action=18&drive=0&speed=0");
+                }
+               }
+        }
