@@ -6,11 +6,19 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using AForge.Imaging.Filters;
+using Rovio.Properties;
+using System.IO;
+using System.Resources;
+using System.Reflection;
 
 namespace Rovio
 {
     public partial class MainForm : Form
     {
+        private BaseRobot ron;
+        public Bitmap map;
+        public Bitmap robotIcon;
         public MainForm()
         {
             InitializeComponent();
@@ -20,43 +28,56 @@ namespace Rovio
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            map = global::Rovio.Properties.Resources.Map;
+            robotIcon = global::Rovio.Properties.Resources.SmallestRobot;
+
             //instantiate the robot object
-            MyRobot ron = new MyRobot("http://10.82.0.33/", "user", "password");
+            ron = new User("http://10.82.0.33/", "user", "password");
             //create and start the robot thread: your own implementation in MyRobot class
-            robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.ProcessImages));
+            robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
+            robot_thread.IsBackground = true;
             robot_thread.Start();
-
-
-            VideoViewer.Location = new Point(0, 0);
-            VideoViewer.Size = this.ClientSize;
         }
 
-        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void Predator_Button_Click(object sender, EventArgs e)
         {
-            //close the robot thread
+            Predator_Button.Enabled = false;
             robot_thread.Abort();
+            ron = new predator("http://10.82.0.33/", "user", "password");
+            robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
+            robot_thread.IsBackground = true;
+            robot_thread.Start();
+            User_Button.Enabled = true;
+            Prey_Button.Enabled = true;
         }
 
-        private void MainForm_Resize(object sender, EventArgs e)
+        private void Prey_Button_Click(object sender, EventArgs e)
         {
-            VideoViewer.Size = this.ClientSize;
+            Prey_Button.Enabled = false;
+            robot_thread.Abort();
+            ron = new Prey("http://10.82.0.33/", "user", "password");
+            robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
+            robot_thread.IsBackground = true;
+            robot_thread.Start();
+            Predator_Button.Enabled = true;
+            User_Button.Enabled = true;
         }
 
-
-        //===================================================================================================================================
-        
-        private delegate void UpdateImageValue(Image image);
-
-        //update the picture box content
-        public void UpdateImage(Image image)
+        private void User_Button_Click(object sender, EventArgs e)
         {
-            VideoViewer.Image = image;
-            if (this.InvokeRequired)
-                this.Invoke(new MethodInvoker(delegate { UpdateImage(image); }));
-            else
-                this.ClientSize = VideoViewer.Image.Size;
+            User_Button.Enabled = false;
+            robot_thread.Abort();
+            ron = new User("http://10.82.0.33/", "user", "password");
+            robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
+            robot_thread.IsBackground = true;
+            robot_thread.Start();
+            Prey_Button.Enabled = true;
+            Predator_Button.Enabled = true;
         }
 
-        //===================================================================================================================================
+        private void Close_Button_Click(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
+        }
     }
 }

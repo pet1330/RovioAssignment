@@ -1,35 +1,5 @@
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.dll
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.dll
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.dll
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.IPPrototyper.dll
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.xml
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.xml
 C:\Users\pete\Dropbox\Lincoln\Year 3\Computer Vision & Robotics\Simester B\Assignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.exe
 C:\Users\pete\Dropbox\Lincoln\Year 3\Computer Vision & Robotics\Simester B\Assignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Workshop 2 - Forms.pdb
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.csprojResolveAssemblyReference.cache
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.csproj.GenerateResource.Cache
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.MainForm.resources
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.Properties.Resources.resources
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.exe.config
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.exe
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.pdb
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.exe
-C:\Users\LABC19\Desktop\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.pdb
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.exe.config
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.exe
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.pdb
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.csprojResolveAssemblyReference.cache
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.MainForm.resources
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.Properties.Resources.resources
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.csproj.GenerateResource.Cache
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.exe
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.pdb
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.dll
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.dll
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.dll
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.IPPrototyper.dll
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.xml
-C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.xml
 C:\Users\pete\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.exe.config
 C:\Users\pete\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.exe
 C:\Users\pete\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.pdb
@@ -89,3 +59,31 @@ C:\Users\LABC19\Desktop\KEEP ROVIO ASSIGNMENT\RovioAssignment\workshop 2\Worksho
 C:\Users\LABC19\Desktop\KEEP ROVIO ASSIGNMENT\RovioAssignment\workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.MainForm.resources
 C:\Users\LABC19\Desktop\KEEP ROVIO ASSIGNMENT\RovioAssignment\workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.Properties.Resources.resources
 C:\Users\LABC19\Desktop\KEEP ROVIO ASSIGNMENT\RovioAssignment\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.csproj.GenerateResource.Cache
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.MainForm.resources
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.Properties.Resources.resources
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.csproj.GenerateResource.Cache
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.exe.config
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.exe
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.pdb
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.dll
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.dll
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.dll
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.IPPrototyper.dll
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.xml
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.xml
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.exe
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.pdb
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.exe.config
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.exe
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\bin\Debug\Assignment.pdb
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.dll
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.dll
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.dll
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.IPPrototyper.dll
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.xml
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\bin\Debug\AForge.Imaging.Formats.xml
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.MainForm.resources
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.Properties.Resources.resources
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.csproj.GenerateResource.Cache
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.exe
+C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.pdb

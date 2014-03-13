@@ -25,7 +25,9 @@ namespace Rovio
                 ActionPlanning.Notifier.WaitOne();
                 foreach (Stats stats in queue.GetConsumingEnumerable())//it will block here automatically waiting from new items to be added and it will not take cpu down 
                 {
-                    Console.WriteLine(stats.blobCount);
+                    fieldMap.setList(stats.blobCount+4);
+
+                    //Console.WriteLine("AP detected: {0}",stats.blobCount);
                     if (stats.blobCount > 1)
                     {
 

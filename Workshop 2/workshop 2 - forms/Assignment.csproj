@@ -88,17 +88,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionPlanning.cs" />
-    <Compile Include="FeatureExtracting.cs" />
+    <Compile Include="ColourFilters.cs" />
+    <Compile Include="Prey.cs" />
     <Compile Include="Stats.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="predator.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MyRobot.cs" />
-    <Compile Include="ProcessImage.cs" />
+    <Compile Include="BaseRobot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
@@ -106,7 +107,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -143,6 +144,21 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Map.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SmallRobot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Map.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Robot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SmallestRobot.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
