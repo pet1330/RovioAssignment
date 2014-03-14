@@ -16,7 +16,7 @@ namespace Rovio
 
         public override void runRovio()
         {
-            while (checkConnection())
+            while (checkConnection() && (mode == USER))
             {
                 Program.mainForm.VideoViewer.Image = getImage();// colourFilter(getImage(), Colours.RED);
                 

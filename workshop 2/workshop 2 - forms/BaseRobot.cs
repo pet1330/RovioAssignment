@@ -18,14 +18,17 @@ namespace Rovio
         protected const int WHITE = 2;
         protected const int YELLOW = 3;
         protected const int BLUE = 4;
+        public const int USER = 0;
+        public const int PREDATOR = 1;
+        public const int PREY = 2;
+        public int mode = 0;
 
         protected System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 8);
         protected float x = 10.0F;
         protected float y = 10.0F;
         protected System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
         protected Bitmap[] FilteredImage;
-        protected Mapping map = new Mapping();
-
+        public Mapping map = new Mapping();
         protected BaseRobot(string address, string user, string password) : base(address, user, password) { }
 
         protected bool checkConnection()
@@ -95,9 +98,9 @@ namespace Rovio
             return FilteredImage;
         }
 
-        protected Stats ExtractFeatrures(Bitmap[] filtered)
+        protected void ExtractFeatrures(Bitmap[] filtered)
         {
-            return null;
+            videoImage(ExtractRedFeatures(filtered[RED]));
         }
 
         protected void ActionPlanning(Bitmap[] info)
@@ -105,36 +108,36 @@ namespace Rovio
 
         }
 
-        private Blob ExtractRedFeatures(Bitmap redFiltered)
+        private Bitmap ExtractRedFeatures(Bitmap redFiltered)
         {
             BlobCounter bc = new BlobCounter();
-            for (int i = RED; i <= BLUE; i++)
+            Stats toReturn = new Stats(RED);
+            bc.MinWidth = 5;
+            bc.MinHeight = 5;
+            bc.FilterBlobs = true;
+            bc.ObjectsOrder = ObjectsOrder.Size;
+            bc.ProcessImage(redFiltered);
+            Rectangle[] rects = bc.GetObjectsRectangles();
+            Rectangle biggest = new Rectangle(0, 0, 0, 0);
+            Graphics g = Graphics.FromImage(redFiltered);
+            if ((rects.Length > 0) && (rects[0].Height > 0))
             {
-                Stats toReturn = new Stats(RED);
-                bc.MinWidth = 5;
-                bc.MinHeight = 5;
-                bc.FilterBlobs = true;
-                bc.ObjectsOrder = ObjectsOrder.Size;
-                bc.ProcessImage(redFiltered);
-                Rectangle[] rects = bc.GetObjectsRectangles();
-                Rectangle biggest = new Rectangle(0, 0, 0, 0);
-                Graphics g = Graphics.FromImage(redFiltered);
-                if ((rects.Length > 0) && (rects[0].Height > 0))
-                {
-                    biggest = rects[0];
-                }
-                
-                toReturn.RedBlockDetected = true;
-                toReturn.RedBlockCenterLocation = new System.Drawing.Point((((biggest.Width / 2) + biggest.X)), (biggest.Y + biggest.Height / 2));
-
-                string objectString = (25.0f / biggest.Height).ToString("#.##");
-                string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + toReturn.RedBlockCenterLocation;
-
-                g.DrawRectangle(new Pen(Color.Blue), biggest);
-                g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
-                g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+                biggest = rects[0];
             }
-            return null;
+
+            toReturn.RedBlockDetected = true;
+            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width/2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+
+            string objectString = (25.0f / biggest.Height).ToString("#.##");
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X-(redFiltered.Width/2));
+
+            g.DrawRectangle(new Pen(Color.Blue), biggest);
+            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+            return redFiltered;
         }
+
+        public delegate void videoImageReady(System.Drawing.Image image);
+        public event videoImageReady videoImage;
     }
 }

@@ -63,49 +63,9 @@ namespace Rovio.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap Map {
-            get {
-                object obj = ResourceManager.GetObject("Map", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         public static System.Drawing.Bitmap Robot {
             get {
                 object obj = ResourceManager.GetObject("Robot", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap SmallestRobot {
-            get {
-                object obj = ResourceManager.GetObject("SmallestRobot", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap SmallMap {
-            get {
-                object obj = ResourceManager.GetObject("SmallMap", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap SmallRobot {
-            get {
-                object obj = ResourceManager.GetObject("SmallRobot", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

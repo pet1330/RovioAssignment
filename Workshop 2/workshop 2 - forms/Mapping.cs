@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Rovio
 {
@@ -18,39 +19,40 @@ namespace Rovio
         private const int W = 0;
         private const int NW = 45;
 
-        private Bitmap map;
-        private Bitmap robotIcon;
+        private Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
+        private const int numOfCellsWidth = 26;
+        private const int numOfCellsHeight = 30;
+        private const int cellSize = 10;
         public Point currentLocation;
         public int orientation;
 
         public Mapping()
         {
-            map = global::Rovio.Properties.Resources.SmallMap;
-            robotIcon = global::Rovio.Properties.Resources.TinyRobot;
             orientation = SE;
             currentLocation = new Point(50, 50);
         }
 
         public void Draw()
         {
-            Bitmap local = map;
-            drawGrid(local);
-            this.AddRovioIcon(ref local);
-            Program.mainForm.MapViewer.Image = local;
+           Bitmap map = new Bitmap(260, 300);
+            using (Graphics gfx = Graphics.FromImage(map))
+            using (SolidBrush brush = new SolidBrush(Color.White))
+            {
+                gfx.FillRectangle(brush, 0, 0, 260, 300);
+            }
+            drawGrid(map);
+            this.AddRovioIcon(map);
+            mapImage(map);
         }
 
-        private void AddRovioIcon(ref Bitmap m)
+        private void AddRovioIcon(Bitmap m)
         {
             Graphics g = Graphics.FromImage(m);
-
             g.DrawImage(rotateImage(robotIcon, orientation), currentLocation.X, currentLocation.Y);
         }
 
         private Bitmap rotateImage(Image image, float angle)
         {
-            if (image == null)
-                throw new ArgumentNullException("image");
-
             //create a new empty bitmap to hold rotated image
             Bitmap rotatedBmp = new Bitmap(image.Width, image.Height);
             rotatedBmp.SetResolution(image.HorizontalResolution, image.VerticalResolution);
@@ -76,19 +78,32 @@ namespace Rovio
         private void drawGrid(Bitmap m)
         {
             Graphics g = Graphics.FromImage(m);
-            int numOfCells = 120;
-            int cellSize = 20;
             Pen p = new Pen(Color.Black);
 
-            for (int y = 0; y < numOfCells; ++y)
+            for (int y = 0; y < numOfCellsHeight; ++y)
             {
-                g.DrawLine(p, 0, y * cellSize, numOfCells * cellSize, y * cellSize);
+                g.DrawLine(p, 0, y * cellSize, numOfCellsWidth * cellSize, y * cellSize);
             }
 
-            for (int x = 0; x < numOfCells; ++x)
+            for (int x = 0; x < numOfCellsWidth; ++x)
             {
-                g.DrawLine(p, x * cellSize, 0, x * cellSize, numOfCells * cellSize);
+                g.DrawLine(p, x * cellSize, 0, x * cellSize, numOfCellsHeight * cellSize);
+
             }
         }
+
+        public void UpdateMap(System.Drawing.Image image)
+        {
+            if (Program.mainForm.InvokeRequired)
+            {
+                Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { UpdateMap(image); }));
+                Program.mainForm.VideoViewer.Image = image;
+            }
+        }
+
+        public delegate void mapImageReady(System.Drawing.Image image);
+        
+        public event mapImageReady mapImage;
+   
     }
 }

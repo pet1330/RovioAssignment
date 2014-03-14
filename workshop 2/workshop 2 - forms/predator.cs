@@ -6,16 +6,17 @@ using System.Drawing;
 using AForge.Imaging.Filters;
 using AForge;
 using AForge.Imaging;
+using System.Windows.Forms;
 
 namespace Rovio
 {
     class predator : BaseRobot
     {
-        public predator(string address, string user, string password) : base(address, user, password) { }
+        public predator(string address, string user, string password) : base(address, user, password) { map.currentLocation = new System.Drawing.Point(100, 100); }
 
         public override void runRovio()
         {
-            while (checkConnection())
+            while (checkConnection() && (mode==PREDATOR))
             {
                 Bitmap RGBImage = getImage();
                 FilteredImage = new Bitmap[5];
@@ -23,31 +24,24 @@ namespace Rovio
                 //------------------------------------------------------------
 
                 FilteredImage = colourFilter(RGBImage);
-
+                ExtractFeatrures(FilteredImage);
                 //Feature Extract
                 //------------------------------------------------------------
-                
 
-                //------------------------------------------------------------
-
-
-
-                //------------------------------------------------------------
-
-
-
-                //------------------------------------------------------------
-
-
-                // Output to Screen
-                //------------------------------------------------------------
-                foreach (Bitmap item in FilteredImage)
-                {
-                    System.Threading.Thread.Sleep(500);
-                    Program.mainForm.VideoViewer.Image = item;
-                }
-                //Program.mainForm.VideoViewer.Image = RGBImage;
             }
+
+                //------------------------------------------------------------
+
+            
+
+            //------------------------------------------------------------
+
         }
+
+        //------------------------------------------------------------
+
+        // Output to Screen
+        //------------------------------------------------------------
+        
     }
 }
