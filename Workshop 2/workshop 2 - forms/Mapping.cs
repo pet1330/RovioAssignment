@@ -34,6 +34,7 @@ namespace Rovio
         public void Draw()
         {
             Bitmap local = map;
+            drawGrid(local);
             this.AddRovioIcon(ref local);
             Program.mainForm.MapViewer.Image = local;
         }
@@ -70,6 +71,24 @@ namespace Rovio
             g.DrawImage(image, new PointF(0, 0));
 
             return rotatedBmp;
+        }
+
+        private void drawGrid(Bitmap m)
+        {
+            Graphics g = Graphics.FromImage(m);
+            int numOfCells = 120;
+            int cellSize = 20;
+            Pen p = new Pen(Color.Black);
+
+            for (int y = 0; y < numOfCells; ++y)
+            {
+                g.DrawLine(p, 0, y * cellSize, numOfCells * cellSize, y * cellSize);
+            }
+
+            for (int x = 0; x < numOfCells; ++x)
+            {
+                g.DrawLine(p, x * cellSize, 0, x * cellSize, numOfCells * cellSize);
+            }
         }
     }
 }

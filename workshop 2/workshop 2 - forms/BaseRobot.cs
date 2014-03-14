@@ -110,6 +110,7 @@ namespace Rovio
             BlobCounter bc = new BlobCounter();
             for (int i = RED; i <= BLUE; i++)
             {
+                Stats toReturn = new Stats(RED);
                 bc.MinWidth = 5;
                 bc.MinHeight = 5;
                 bc.FilterBlobs = true;
@@ -122,7 +123,7 @@ namespace Rovio
                 {
                     biggest = rects[0];
                 }
-                Stats toReturn = new Stats(RED);
+                
                 toReturn.RedBlockDetected = true;
                 toReturn.RedBlockCenterLocation = new System.Drawing.Point((((biggest.Width / 2) + biggest.X)), (biggest.Y + biggest.Height / 2));
 
