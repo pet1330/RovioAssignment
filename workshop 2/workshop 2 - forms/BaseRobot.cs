@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
-using AForge;
 using System.Threading;
+using AForge;
 using System.Collections.Concurrent;
 using AForge.Imaging.Filters;
 using AForge.Imaging;
@@ -24,6 +24,7 @@ namespace Rovio
         protected float y = 10.0F;
         protected System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
         protected Bitmap[] FilteredImage;
+        protected Mapping map = new Mapping();
 
         protected BaseRobot(string address, string user, string password) : base(address, user, password) { }
 
@@ -42,10 +43,7 @@ namespace Rovio
 
         protected Bitmap getImage()
         {
-            Bitmap local = Program.mainForm.map;
-            Graphics g = Graphics.FromImage(local);
-            g.DrawImage(Program.mainForm.robotIcon, 50, 50);
-            Program.mainForm.MapViewer.Image = local;
+            map.Draw();
             return this.Camera.Image;
         }
 
@@ -99,6 +97,16 @@ namespace Rovio
 
         protected Stats ExtractFeatrures(Bitmap[] filtered)
         {
+            return null;
+        }
+
+        protected void ActionPlanning(Bitmap[] info)
+        {
+
+        }
+
+        private Blob ExtractRedFeatures(Bitmap redFiltered)
+        {
             BlobCounter bc = new BlobCounter();
             for (int i = RED; i <= BLUE; i++)
             {
@@ -106,31 +114,26 @@ namespace Rovio
                 bc.MinHeight = 5;
                 bc.FilterBlobs = true;
                 bc.ObjectsOrder = ObjectsOrder.Size;
-                bc.ProcessImage(filtered[i]);
+                bc.ProcessImage(redFiltered);
                 Rectangle[] rects = bc.GetObjectsRectangles();
                 Rectangle biggest = new Rectangle(0, 0, 0, 0);
-                Graphics g = Graphics.FromImage(filtered[i]);
-                foreach (Blob blob in bc.GetObjectsInformation())
-                {
-                    List<IntPoint> edgePoints = bc.GetBlobsEdgePoints(blob);
-                }
+                Graphics g = Graphics.FromImage(redFiltered);
                 if ((rects.Length > 0) && (rects[0].Height > 0))
                 {
                     biggest = rects[0];
                 }
-                System.Drawing.Point objectCeter = new System.Drawing.Point((((biggest.Width / 2) + biggest.X)), (biggest.Y + biggest.Height / 2));
+                Stats toReturn = new Stats(RED);
+                toReturn.RedBlockDetected = true;
+                toReturn.RedBlockCenterLocation = new System.Drawing.Point((((biggest.Width / 2) + biggest.X)), (biggest.Y + biggest.Height / 2));
+
                 string objectString = (25.0f / biggest.Height).ToString("#.##");
-                string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + objectCeter;
+                string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + toReturn.RedBlockCenterLocation;
+
                 g.DrawRectangle(new Pen(Color.Blue), biggest);
-                g.DrawString(objectString, drawFont, Brushes.White, objectCeter.X, objectCeter.Y, drawFormat);
+                g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
                 g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
             }
             return null;
-        }
-
-        protected void ActionPlanning(Bitmap[] info)
-        {
-
         }
     }
 }

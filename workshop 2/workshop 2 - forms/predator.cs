@@ -24,7 +24,6 @@ namespace Rovio
 
                 FilteredImage = colourFilter(RGBImage);
 
-
                 //Feature Extract
                 //------------------------------------------------------------
                 

@@ -17,8 +17,6 @@ namespace Rovio
     public partial class MainForm : Form
     {
         private BaseRobot ron;
-        public Bitmap map;
-        public Bitmap robotIcon;
         public MainForm()
         {
             InitializeComponent();
@@ -28,9 +26,6 @@ namespace Rovio
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            map = global::Rovio.Properties.Resources.Map;
-            robotIcon = global::Rovio.Properties.Resources.SmallestRobot;
-
             //instantiate the robot object
             ron = new User("http://10.82.0.33/", "user", "password");
             //create and start the robot thread: your own implementation in MyRobot class

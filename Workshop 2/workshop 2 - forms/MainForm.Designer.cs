@@ -82,9 +82,9 @@
             // MapViewer
             // 
             this.MapViewer.InitialImage = null;
-            this.MapViewer.Location = new System.Drawing.Point(386, 13);
+            this.MapViewer.Location = new System.Drawing.Point(370, 40);
             this.MapViewer.Name = "MapViewer";
-            this.MapViewer.Size = new System.Drawing.Size(440, 320);
+            this.MapViewer.Size = new System.Drawing.Size(300, 260);
             this.MapViewer.TabIndex = 2;
             this.MapViewer.TabStop = false;
             // 
@@ -102,7 +102,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(838, 345);
+            this.ClientSize = new System.Drawing.Size(675, 345);
             this.ControlBox = false;
             this.Controls.Add(this.Close_Button);
             this.Controls.Add(this.User_Button);
@@ -111,6 +111,8 @@
             this.Controls.Add(this.MapViewer);
             this.Controls.Add(this.VideoViewer);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximumSize = new System.Drawing.Size(681, 373);
+            this.MinimumSize = new System.Drawing.Size(681, 373);
             this.Name = "MainForm";
             this.Text = "MainForm";
             this.Load += new System.EventHandler(this.MainForm_Load);

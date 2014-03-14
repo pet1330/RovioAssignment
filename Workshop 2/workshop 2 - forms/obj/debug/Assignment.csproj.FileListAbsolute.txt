@@ -87,3 +87,4 @@ C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\obj\Debug\Rovio.Properties
 C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.csproj.GenerateResource.Cache
 C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.exe
 C:\Users\LABC19\Desktop\workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.pdb
+C:\Users\LABC19\Documents\GitHub\RovioAssignment\Workshop 2\Workshop 2 - Forms\obj\Debug\Assignment.csprojResolveAssemblyReference.cache
