@@ -27,52 +27,25 @@ namespace Rovio
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            //instantiate the robot object
             ron = new User(login[0], login[1], login[2]);
-            //create and start the robot thread: your own implementation in MyRobot class
             robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
             robot_thread.IsBackground = true;
-
-            ron.videoImage +=new BaseRobot.videoImageReady(videoImage);
-            ron.map.mapImage+=new Mapping.mapImageReady(mapImage);
             robot_thread.Start();
         }
 
         private void Predator_Button_Click(object sender, EventArgs e)
         {
-            Predator_Button.Enabled = false;
-            ron.mode = BaseRobot.PREDATOR; //Kill Thread
-            while (robot_thread.IsAlive) ;
-            ron = new predator(login[0], login[1], login[2]);
-            robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
-            robot_thread.IsBackground = true;
-            robot_thread.Start();
-            User_Button.Enabled = true;
-            Prey_Button.Enabled = true;
+            ChangeMode(1);
         }
 
         private void Prey_Button_Click(object sender, EventArgs e)
         {
-            Prey_Button.Enabled = false;
-            robot_thread.Abort();
-            ron = new Prey(login[0], login[1], login[2]);
-            robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
-            robot_thread.IsBackground = true;
-            robot_thread.Start();
-            Predator_Button.Enabled = true;
-            User_Button.Enabled = true;
+            ChangeMode(2);
         }
 
         private void User_Button_Click(object sender, EventArgs e)
         {
-            User_Button.Enabled = false;
-            robot_thread.Abort();
-            ron = new User(login[0], login[1], login[2]);
-            robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
-            robot_thread.IsBackground = true;
-            robot_thread.Start();
-            Prey_Button.Enabled = true;
-            Predator_Button.Enabled = true;
+            ChangeMode(0);
         }
 
         private void Close_Button_Click(object sender, EventArgs e)
@@ -80,21 +53,61 @@ namespace Rovio
             Environment.Exit(0);
         }
 
+        private void ChangeMode(int mode)
+        {
+            Predator_Button.Enabled = false;
+            User_Button.Enabled = false;
+            Prey_Button.Enabled = false;
+            ron.terminateRovio();
+            switch (mode)
+            {
+                case 1:
+                    ron = new predator(login[0], login[1], login[2]);
+                    Predator_Button.Enabled = false;
+                    User_Button.Enabled = true;
+                    Prey_Button.Enabled = true;
+                    break;
+                case 2:
+                    ron = new Prey(login[0], login[1], login[2]);
+                    Predator_Button.Enabled = true;
+                    User_Button.Enabled = true;
+                    Prey_Button.Enabled = false;
+                    break;
+                default:
+                    ron = new User(login[0], login[1], login[2]);
+                    Predator_Button.Enabled = true;
+                    User_Button.Enabled = false;
+                    Prey_Button.Enabled = true;
+                    break;
+            }
+
+            robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
+            robot_thread.IsBackground = true;
+            robot_thread.Start();
+        }
+
         public void videoImage(Image image)
         {
-            this.VideoViewer.Image = image;
             if (this.InvokeRequired)
             {
                 this.Invoke(new MethodInvoker(delegate { videoImage(image); }));
+            }
+            else
+            {
+                this.VideoViewer.Image = image;
             }
         }
 
         public void mapImage(Image image)
         {
-            this.VideoViewer.Image = image;
+
             if (this.InvokeRequired)
             {
                 this.Invoke(new MethodInvoker(delegate { mapImage(image); }));
+            }
+            else
+            {
+                this.VideoViewer.Image = image;
             }
         }
 

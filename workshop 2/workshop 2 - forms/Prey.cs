@@ -15,15 +15,26 @@ namespace Rovio
         public Prey(string address, string user, string password)
             : base(address, user, password)
         {
-            ColourFilters colourfilter = new ColourFilters();
         }
 
         public override void runRovio()
         {
-            while (checkConnection() && (mode == PREY))
+            while (checkConnection() && run)
             {
                 Bitmap RGBImage = getImage();
+                FilteredImage = new Bitmap[5];
+                //processImage
+                //------------------------------------------------------------
+                FilteredImage = colourFilter(RGBImage);
 
+                //FeatureExtract
+                //------------------------------------------------------------
+                //RGBImage = DetectCorners(FilteredImage[RED]);
+
+                //------------------------------------------------------------
+
+                // Output to Screen
+                //------------------------------------------------------------   
                 Program.mainForm.VideoViewer.Image = RGBImage;
             }
         }

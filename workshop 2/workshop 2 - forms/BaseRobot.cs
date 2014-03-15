@@ -18,10 +18,6 @@ namespace Rovio
         protected const int WHITE = 2;
         protected const int YELLOW = 3;
         protected const int BLUE = 4;
-        public const int USER = 0;
-        public const int PREDATOR = 1;
-        public const int PREY = 2;
-        public int mode = 0;
 
         protected System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 8);
         protected float x = 10.0F;
@@ -29,7 +25,13 @@ namespace Rovio
         protected System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
         protected Bitmap[] FilteredImage;
         public Mapping map = new Mapping();
-        protected BaseRobot(string address, string user, string password) : base(address, user, password) { }
+        protected volatile bool run;
+
+        protected BaseRobot(string address, string user, string password) : base(address, user, password) 
+        {
+            run = true;
+        }
+        
 
         protected bool checkConnection()
         {
@@ -128,42 +130,18 @@ namespace Rovio
             toReturn.RedBlockDistance = (25.0f / biggest.Height);
 
             string objectString = (25.0f / biggest.Height).ToString("#.##");
-            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (redFiltered.Width / 2));
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (Filtered.Width / 2));
             g.DrawRectangle(new Pen(Color.Blue), biggest);
             g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
             g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
             return Filtered;
         }
 
-        private Bitmap ExtractMultipleFeatures(Bitmap Filtered, int colour)
+        private Bitmap ExtractGreenFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
-            switch (colour)
-            {
-                case GREEN:
-                    bc.MinHeight = 0;
-                    bc.MinWidth = 0;
-                    break;
-                case WHITE:
-                    bc.MinHeight = 0;
-                    bc.MinWidth = 0;
-                    bc.MaxHeight = 0;
-                    break;
-                case YELLOW:
-                    bc.MinHeight = 0;
-                    bc.MinWidth = 0;
-                    bc.MaxHeight = 0;
-                    break;
-                case BLUE:
-                    bc.MinHeight = 0;
-                    bc.MinWidth = 0;
-                    bc.MaxHeight = 0;
-                    break;
-                default:
-                    bc.MinHeight = 0;
-                    bc.MinWidth = 0;
-                    break;
-            }
+            bc.MinHeight = 15;
+            bc.MinWidth = 15;
 
             bc.FilterBlobs = true;
             bc.ObjectsOrder = ObjectsOrder.Size;
@@ -174,27 +152,10 @@ namespace Rovio
 
             foreach (Rectangle r in rects)
             {
-                if (colour == YELLOW || colour == WHITE)
-                {
-                    for (int i = 0, n = blobs.Length; i < n; i++)
-                    {
-                        List<IntPoint> edgePoints = blobCounter.GetBlobsEdgePoints(blobs[i]);
-                        List<IntPoint> corners = PointsCloud.FindQuadrilateralCorners(edgePoints);
-
-                        g.DrawPolygon(new Pen(Color.Red, ToPointsArray(corners));
-                    }
-                }
-                else if (colour == BLUE)
-                {
-                
-                }
-                else 
-                { 
-                
-                }
+                biggest = rects[0];
             }
 
-            Stats toReturn = new Stats(colour);
+            Stats toReturn = new Stats(GREEN);
             toReturn.RedBlockDetected = true;
             toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
             toReturn.RedBlockHeight = biggest.Height;
@@ -202,14 +163,14 @@ namespace Rovio
             toReturn.RedBlockDistance = (25.0f / biggest.Height);
 
             string objectString = (25.0f / biggest.Height).ToString("#.##");
-            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (redFiltered.Width / 2));
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (Filtered.Width / 2));
             g.DrawRectangle(new Pen(Color.Blue), biggest);
             g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
             g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
             return Filtered;
         }
 
-        public void DetectCorners(Bitmap image)
+        public Bitmap DetectCorners(Bitmap image)
         {
             Graphics graphics = Graphics.FromImage(image);
             Pen pen = new Pen(new SolidBrush(Color.Red));
@@ -225,7 +186,7 @@ namespace Rovio
             }
 
             // Display
-            pictureBox.Image = image;
+            return image;
         }
 
         protected void ActionPlanning(Bitmap[] info)
@@ -235,5 +196,23 @@ namespace Rovio
 
         public delegate void videoImageReady(System.Drawing.Image image);
         public event videoImageReady videoImage;
+
+        public void UpdateVideo(System.Drawing.Image image)
+        {
+            if (Program.mainForm.InvokeRequired)
+            {
+                Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { UpdateVideo(image); }));
+            }
+            else
+            {
+                Program.mainForm.VideoViewer.Image = image;
+            }
+        }
+
+        public void terminateRovio()
+        {
+            run = false;
+        }
+    
     }
 }

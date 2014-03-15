@@ -11,15 +11,28 @@ namespace Rovio
     class User : BaseRobot
     {
         public User(string address, string user, string password) : base(address, user, password){
-            ColourFilters colourfilter = new ColourFilters();
         }
 
         public override void runRovio()
         {
-            while (checkConnection() && (mode == USER))
+            while (checkConnection())
             {
-                Program.mainForm.VideoViewer.Image = getImage();// colourFilter(getImage(), Colours.RED);
-                
+                Bitmap RGBImage = getImage();
+                FilteredImage = new Bitmap[5];
+                //processImage
+                //------------------------------------------------------------
+                FilteredImage = colourFilter(RGBImage);
+
+                //FeatureExtract
+                //------------------------------------------------------------
+                //RGBImage = DetectCorners(FilteredImage[RED]);
+
+                //------------------------------------------------------------
+
+                // Output to Screen
+                //------------------------------------------------------------   
+                UpdateVideo(RGBImage);
+                if (!run) return;
             }
         }
     }

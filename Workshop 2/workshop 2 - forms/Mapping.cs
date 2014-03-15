@@ -34,7 +34,7 @@ namespace Rovio
 
         public void Draw()
         {
-           Bitmap map = new Bitmap(260, 300);
+            Bitmap map = new Bitmap(260, 300);
             using (Graphics gfx = Graphics.FromImage(map))
             using (SolidBrush brush = new SolidBrush(Color.White))
             {
@@ -42,7 +42,7 @@ namespace Rovio
             }
             drawGrid(map);
             this.AddRovioIcon(map);
-            mapImage(map);
+            UpdateMap(map);
         }
 
         private void AddRovioIcon(Bitmap m)
@@ -92,18 +92,24 @@ namespace Rovio
             }
         }
 
+
         public void UpdateMap(System.Drawing.Image image)
         {
+            
             if (Program.mainForm.InvokeRequired)
             {
                 Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { UpdateMap(image); }));
-                Program.mainForm.VideoViewer.Image = image;
+            }
+            else 
+            {
+                Program.mainForm.MapViewer.Image = image;
             }
         }
 
+
         public delegate void mapImageReady(System.Drawing.Image image);
-        
+
         public event mapImageReady mapImage;
-   
+
     }
 }
