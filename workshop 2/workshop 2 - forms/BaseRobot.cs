@@ -102,7 +102,7 @@ namespace Rovio
 
         protected void ExtractFeatrures(Bitmap[] filtered)
         {
-            videoImage(ExtractRedFeatures(filtered[RED]));
+            UpdateVideo(ExtractRedFeatures(filtered[RED]));
         }
 
         private Bitmap ExtractRedFeatures(Bitmap Filtered)
@@ -128,6 +128,32 @@ namespace Rovio
             toReturn.RedBlockHeight = biggest.Height;
             toReturn.RedBlockWidth = biggest.Width;
             toReturn.RedBlockDistance = (25.0f / biggest.Height);
+            //===============================================================
+
+             this.map.blockWidth = biggest.Width;
+             this.map.blockHeightAtOnemeter = 25.0f;
+             this.map.blocksCurrentHeight = biggest.Height;
+             this.map.distanceToWidthSightPathRatio = 0.92f;
+             this.map.imageWidth = Filtered.Width;
+             this.map.blockXLocation = biggest.X;
+
+            //float answer = (((blockWidth / 2) + blockXLocation) / ((imageWidth / 2) / (((blockHeightAtOnemeter / blocksCurrentHeight) * distanceToWidthSightPathRatio) / 2)));
+
+
+
+
+            // float a = (((25.0f / biggest.Height) * 0.92f)/2);
+            //
+            //  float b = ((Filtered.Width / 2) / a);
+            //
+            //  float c = (((((biggest.Width / 2) + biggest.X))) / b);
+
+
+
+
+            //==============================================================
+
+
 
             string objectString = (25.0f / biggest.Height).ToString("#.##");
             string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (Filtered.Width / 2));
