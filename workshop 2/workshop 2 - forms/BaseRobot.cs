@@ -103,12 +103,7 @@ namespace Rovio
             videoImage(ExtractRedFeatures(filtered[RED]));
         }
 
-        protected void ActionPlanning(Bitmap[] info)
-        {
-
-        }
-
-        private Bitmap ExtractRedFeatures(Bitmap redFiltered)
+        private Bitmap ExtractRedFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
             Stats toReturn = new Stats(RED);
@@ -116,25 +111,126 @@ namespace Rovio
             bc.MinHeight = 5;
             bc.FilterBlobs = true;
             bc.ObjectsOrder = ObjectsOrder.Size;
-            bc.ProcessImage(redFiltered);
+            bc.ProcessImage(Filtered);
             Rectangle[] rects = bc.GetObjectsRectangles();
             Rectangle biggest = new Rectangle(0, 0, 0, 0);
-            Graphics g = Graphics.FromImage(redFiltered);
+            Graphics g = Graphics.FromImage(Filtered);
+
             if ((rects.Length > 0) && (rects[0].Height > 0))
             {
                 biggest = rects[0];
             }
 
             toReturn.RedBlockDetected = true;
-            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width/2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+            toReturn.RedBlockHeight = biggest.Height;
+            toReturn.RedBlockWidth = biggest.Width;
+            toReturn.RedBlockDistance = (25.0f / biggest.Height);
 
             string objectString = (25.0f / biggest.Height).ToString("#.##");
-            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X-(redFiltered.Width/2));
-
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (redFiltered.Width / 2));
             g.DrawRectangle(new Pen(Color.Blue), biggest);
             g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
             g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
-            return redFiltered;
+            return Filtered;
+        }
+
+        private Bitmap ExtractMultipleFeatures(Bitmap Filtered, int colour)
+        {
+            BlobCounter bc = new BlobCounter();
+            switch (colour)
+            {
+                case GREEN:
+                    bc.MinHeight = 0;
+                    bc.MinWidth = 0;
+                    break;
+                case WHITE:
+                    bc.MinHeight = 0;
+                    bc.MinWidth = 0;
+                    bc.MaxHeight = 0;
+                    break;
+                case YELLOW:
+                    bc.MinHeight = 0;
+                    bc.MinWidth = 0;
+                    bc.MaxHeight = 0;
+                    break;
+                case BLUE:
+                    bc.MinHeight = 0;
+                    bc.MinWidth = 0;
+                    bc.MaxHeight = 0;
+                    break;
+                default:
+                    bc.MinHeight = 0;
+                    bc.MinWidth = 0;
+                    break;
+            }
+
+            bc.FilterBlobs = true;
+            bc.ObjectsOrder = ObjectsOrder.Size;
+            bc.ProcessImage(Filtered);
+            Rectangle[] rects = bc.GetObjectsRectangles();
+            Rectangle biggest = new Rectangle(0, 0, 0, 0);
+            Graphics g = Graphics.FromImage(Filtered);
+
+            foreach (Rectangle r in rects)
+            {
+                if (colour == YELLOW || colour == WHITE)
+                {
+                    for (int i = 0, n = blobs.Length; i < n; i++)
+                    {
+                        List<IntPoint> edgePoints = blobCounter.GetBlobsEdgePoints(blobs[i]);
+                        List<IntPoint> corners = PointsCloud.FindQuadrilateralCorners(edgePoints);
+
+                        g.DrawPolygon(new Pen(Color.Red, ToPointsArray(corners));
+                    }
+                }
+                else if (colour == BLUE)
+                {
+                
+                }
+                else 
+                { 
+                
+                }
+            }
+
+            Stats toReturn = new Stats(colour);
+            toReturn.RedBlockDetected = true;
+            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+            toReturn.RedBlockHeight = biggest.Height;
+            toReturn.RedBlockWidth = biggest.Width;
+            toReturn.RedBlockDistance = (25.0f / biggest.Height);
+
+            string objectString = (25.0f / biggest.Height).ToString("#.##");
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (redFiltered.Width / 2));
+            g.DrawRectangle(new Pen(Color.Blue), biggest);
+            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+            return Filtered;
+        }
+
+        public void DetectCorners(Bitmap image)
+        {
+            Graphics graphics = Graphics.FromImage(image);
+            Pen pen = new Pen(new SolidBrush(Color.Red));
+
+            // Create corner detector and have it process the image
+            MoravecCornersDetector mcd = new MoravecCornersDetector();
+            List<IntPoint> corners = mcd.ProcessImage(image);
+
+            // Visualization: Draw 3x3 boxes around the corners
+            foreach (IntPoint corner in corners)
+            {
+                graphics.DrawRectangle(pen, corner.X - 1, corner.Y - 1, 3, 3);
+            }
+
+            // Display
+            pictureBox.Image = image;
+        }
+
+        protected void ActionPlanning(Bitmap[] info)
+        {
+
         }
 
         public delegate void videoImageReady(System.Drawing.Image image);

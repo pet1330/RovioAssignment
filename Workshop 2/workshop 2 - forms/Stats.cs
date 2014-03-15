@@ -8,15 +8,18 @@ namespace Rovio
 {
     class Stats
     {
+        //RED BLOCK
+        //---------------------------------------------------------------
         int colour = 0;
         public bool RedBlockDetected = false;
         public float RedBlockDistance;
         public Point RedBlockCenterLocation = new Point(0, 0);
+        public int RedBlockHeight = 0;
+        public int RedBlockWidth = 0;
         
         public Stats(int colourFilter)
         {
-        
-        
+            colour = colourFilter;
         }
     }
 }
