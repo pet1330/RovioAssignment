@@ -43,7 +43,23 @@ namespace Rovio
         public Point currentLocation;
         public int orientation;
 
-        public Mapping() { }
+        public Mapping()
+        {
+            orientation = 90;
+            Point start = new Point(120, 190);
+            Point rotated = RotateLocation(start);
+            Console.WriteLine("Start Location = {0}     new Location = {1}",start,rotated);
+        }
+
+        public double sin(double angle)
+        {
+            return Math.Sin((angle * (Math.PI / 180)));
+        }
+
+        public double cos(double angle)
+        {
+            return Math.Cos((angle * (Math.PI / 180)));
+        }
 
         public void Draw()
         {
@@ -51,16 +67,26 @@ namespace Rovio
             Graphics gfx = Graphics.FromImage(map);
             SolidBrush brush = new SolidBrush(Color.White);
             gfx.FillRectangle(brush, 0, 0, 260, 300);
-            //drawGrid(map);
+            drawGrid(map);
             drawRedBlock(map);
             this.AddRovioIcon(map);
             UpdateMap(map);
         }
 
+        private Point RotateLocation(Point old) 
+        {
+            double rotatedX = (old.X * cos(orientation)) + (old.Y * sin(orientation));
+            double rotatedY = (-old.X * sin(orientation)) + old.Y * cos(orientation);
+            Point toReturn = new Point(Convert.ToInt32(rotatedX), Convert.ToInt32(rotatedY));
+            return toReturn;
+        }
+
         private void AddRovioIcon(Bitmap m)
         {
             Graphics g = Graphics.FromImage(m);
-            g.DrawImage(rotateImage(robotIcon, orientation), currentLocation.X, currentLocation.Y);
+            int x = (currentLocation.X - ((robotIcon.Width)/2));
+            int y = (currentLocation.Y - ((robotIcon.Height) / 2));
+            g.DrawImage(rotateImage(robotIcon, orientation), x,y);
         }
 
         private Bitmap rotateImage(Image image, float angle)
@@ -91,16 +117,22 @@ namespace Rovio
         {
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.Black);
-            for (int y = 0; y < numOfCellsHeight; ++y)
+            for (int y = 0; y <= numOfCellsHeight; ++y)
             {
                 g.DrawLine(p, 0, y * cellSize, numOfCellsWidth * cellSize, y * cellSize);
             }
 
-            for (int x = 0; x < numOfCellsWidth; ++x)
+            for (int x = 0; x <= numOfCellsWidth; ++x)
             {
                 g.DrawLine(p, x * cellSize, 0, x * cellSize, numOfCellsHeight * cellSize);
 
             }
+
+            g.FillRectangle(new SolidBrush(Color.Black), 0, 0, 30, 100);
+            g.FillRectangle(new SolidBrush(Color.Black), m.Width - 30, 0, 30, 100);
+            g.FillRectangle(new SolidBrush(Color.Black), 0, m.Height - 100, 30, 100);
+            g.FillRectangle(new SolidBrush(Color.Black), m.Width - 30, m.Height - 100, 30, 100);
+
         }
 
         private void drawRedBlock(Bitmap m)
@@ -115,7 +147,6 @@ namespace Rovio
             {
                 dist = ((25.0f / blocksCurrentHeight) * 100f);
             }
-            // float answer = (((blockWidth / 2) + blockXLocation) / ((imageWidth/2) / ((((blockHeightAtOnemeter / blocksCurrentHeight) * 100) * distanceToWidthSightPathRatio) / 2)));
 
             float a = ((dist * 0.92f));
             a = ((imageWidth) / a);
@@ -133,21 +164,14 @@ namespace Rovio
             }
 
             float col = (currentLocationY - dist);
-
-            String toDraw = String.Format("A = {0} \nDist = {1}\nPlotted X = {2}\nPlotted Y = {3}\nCurrentX = {4}\nCurrentY = {5}", a, dist, row, col, currentLocationX, currentLocationY);
-
-
-            g.DrawString(toDraw, new System.Drawing.Font("Arial", 8), Brushes.Black, 10.0f, 10.0f, new System.Drawing.StringFormat());
-
-            g.FillRectangle(new SolidBrush(Color.Green), row, col, 10, 10);
-            g.FillRectangle(new SolidBrush(Color.Red), RedBlockLocation.X, RedBlockLocation.Y, 10, 10);
+            g.FillRectangle(new SolidBrush(Color.Red), row, col, 10, 10);
         }
 
         private void drawGreenBlocks(Bitmap m, Point block)
         {
-
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.Green);
+
         }
 
         public void UpdateMap(System.Drawing.Image image)

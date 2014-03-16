@@ -218,7 +218,6 @@ namespace Rovio
         }
 
         public delegate void videoImageReady(System.Drawing.Image image);
-        public event videoImageReady videoImage;
 
         public void UpdateVideo(System.Drawing.Image image)
         {
