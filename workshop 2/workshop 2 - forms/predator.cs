@@ -23,7 +23,7 @@ namespace Rovio
             {
                 Bitmap RGBImage = getImage();
                 FilteredImage = new Bitmap[5];
-                this.map.currentLocation = new System.Drawing.Point(120, 290);
+                this.map.currentLocation = new System.Drawing.Point(120, 190);
                 //this.map.RedBlockLocation = new System.Drawing.Point(0,0);
                 this.map.orientation = 90;
                 //processImage

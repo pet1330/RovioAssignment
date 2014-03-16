@@ -10,12 +10,14 @@ namespace Rovio
     class Mapping
     {
 
-            public float blockWidth;
-            public float blockHeightAtOnemeter; 
-            public float blocksCurrentHeight; 
-            public float distanceToWidthSightPathRatio; 
-            public float imageWidth;
-            public float blockXLocation; 
+        public float blockWidth;
+        public float blockHeightAtOnemeter;
+        public float blocksCurrentHeight;
+        public float distanceToWidthSightPathRatio;
+        public float imageWidth;
+        public float blockXLocation;
+        public float currentLocationX;
+        public float currentLocationY;
 
 
         //========================
@@ -41,7 +43,7 @@ namespace Rovio
         public Point currentLocation;
         public int orientation;
 
-        public Mapping() {}
+        public Mapping() { }
 
         public void Draw()
         {
@@ -49,7 +51,7 @@ namespace Rovio
             Graphics gfx = Graphics.FromImage(map);
             SolidBrush brush = new SolidBrush(Color.White);
             gfx.FillRectangle(brush, 0, 0, 260, 300);
-            drawGrid(map);
+            //drawGrid(map);
             drawRedBlock(map);
             this.AddRovioIcon(map);
             UpdateMap(map);
@@ -105,12 +107,40 @@ namespace Rovio
         {
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.Red);
-            float answer = (((blockWidth / 2) + blockXLocation) / ((imageWidth/2) / ((((blockHeightAtOnemeter / blocksCurrentHeight) * 100) * distanceToWidthSightPathRatio) / 2)));
- 
-            g.DrawString(answer.ToString(), new System.Drawing.Font("Arial", 8), Brushes.Black, 10.0f, 10.0f, new System.Drawing.StringFormat());
+            float dist=1.0f;
+            currentLocationX = (float) currentLocation.X;
+            currentLocationY = (float) currentLocation.Y;
 
-             g.FillRectangle(new SolidBrush(Color.Green), ((currentLocation.X/2) + answer), ((300-((25.0f / blocksCurrentHeight)*100))), 10, 10);
-             g.FillRectangle(new SolidBrush(Color.Red), RedBlockLocation.X,RedBlockLocation.Y,10,10);
+            if (blocksCurrentHeight != 0)
+            {
+                dist = ((25.0f / blocksCurrentHeight) * 100f);
+            }
+            // float answer = (((blockWidth / 2) + blockXLocation) / ((imageWidth/2) / ((((blockHeightAtOnemeter / blocksCurrentHeight) * 100) * distanceToWidthSightPathRatio) / 2)));
+
+            float a = ((dist * 0.92f));
+            a = ((imageWidth) / a);
+            a = (((blockWidth / 2.0f) + (blockXLocation)) / a);
+
+            float row = 0;
+
+            if (((blockWidth / 2.0f) + (blockXLocation)) <= (imageWidth / 2))
+            {
+                row = (currentLocationX - (((dist * 0.92f) / 2.0f) - a));
+            }
+            else
+            {
+                row = (currentLocationX + (((dist * 0.92f) / 2.0f) - ((dist * 0.92f) - a)));
+            }
+
+            float col = (currentLocationY - dist);
+
+            String toDraw = String.Format("A = {0} \nDist = {1}\nPlotted X = {2}\nPlotted Y = {3}\nCurrentX = {4}\nCurrentY = {5}", a, dist, row, col, currentLocationX, currentLocationY);
+
+
+            g.DrawString(toDraw, new System.Drawing.Font("Arial", 8), Brushes.Black, 10.0f, 10.0f, new System.Drawing.StringFormat());
+
+            g.FillRectangle(new SolidBrush(Color.Green), row, col, 10, 10);
+            g.FillRectangle(new SolidBrush(Color.Red), RedBlockLocation.X, RedBlockLocation.Y, 10, 10);
         }
 
         private void drawGreenBlocks(Bitmap m, Point block)
@@ -118,7 +148,6 @@ namespace Rovio
 
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.Green);
-           // g.FillRectangles(
         }
 
         public void UpdateMap(System.Drawing.Image image)
@@ -135,8 +164,5 @@ namespace Rovio
         }
 
         public delegate void mapImageReady(System.Drawing.Image image);
-
-        public event mapImageReady mapImage;
-
     }
 }

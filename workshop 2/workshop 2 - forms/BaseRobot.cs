@@ -139,9 +139,6 @@ namespace Rovio
 
             //float answer = (((blockWidth / 2) + blockXLocation) / ((imageWidth / 2) / (((blockHeightAtOnemeter / blocksCurrentHeight) * distanceToWidthSightPathRatio) / 2)));
 
-
-
-
             // float a = (((25.0f / biggest.Height) * 0.92f)/2);
             //
             //  float b = ((Filtered.Width / 2) / a);
@@ -156,7 +153,7 @@ namespace Rovio
 
 
             string objectString = (25.0f / biggest.Height).ToString("#.##");
-            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (Filtered.Width / 2));
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
             g.DrawRectangle(new Pen(Color.Blue), biggest);
             g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
             g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
