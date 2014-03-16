@@ -80,7 +80,6 @@ namespace Rovio
                     Prey_Button.Enabled = true;
                     break;
             }
-
             robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
             robot_thread.IsBackground = true;
             robot_thread.Start();

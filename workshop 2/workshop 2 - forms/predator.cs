@@ -25,14 +25,14 @@ namespace Rovio
                 FilteredImage = new Bitmap[5];
                 this.map.currentLocation = new System.Drawing.Point(120, 190);
                 //this.map.RedBlockLocation = new System.Drawing.Point(0,0);
-                this.map.orientation = 90;
+                this.map.orientation = 0;
                 //processImage
                 //------------------------------------------------------------
                 FilteredImage = colourFilter(RGBImage);
-                
+
                 //FeatureExtract
                 //------------------------------------------------------------
-               // RGBImage = DetectCorners(FilteredImage[RED]);
+                // RGBImage = DetectCorners(FilteredImage[RED]);
                 ExtractFeatrures(FilteredImage);
                 this.map.Draw();
                 //------------------------------------------------------------
@@ -42,6 +42,8 @@ namespace Rovio
                 //UpdateVideo(RGBImage);
                 if (!run) return;
             }
+            //Reach this line connection is lost
+            UpdateVideo(ConnectionLost);
         }
     }
 }

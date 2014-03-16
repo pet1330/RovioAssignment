@@ -63,6 +63,16 @@ namespace Rovio.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap ConnectionLost {
+            get {
+                object obj = ResourceManager.GetObject("ConnectionLost", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Robot {
             get {
                 object obj = ResourceManager.GetObject("Robot", resourceCulture);

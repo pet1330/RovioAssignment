@@ -20,7 +20,6 @@ namespace Rovio
                 Bitmap RGBImage = getImage();
                 FilteredImage = new Bitmap[5];
                 this.map.currentLocation = new System.Drawing.Point(130, 150);
-                this.map.RedBlockLocation = new System.Drawing.Point(0, 0);
                 this.map.orientation = 0;
                // this.map.Draw();
                 //processImage
@@ -38,6 +37,8 @@ namespace Rovio
                 //UpdateVideo(RGBImage);
                 if (!run) return;
             }
+            //Reach this line connection is lost
+            UpdateVideo(ConnectionLost);
         }
     }
 }

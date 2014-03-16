@@ -37,6 +37,8 @@ namespace Rovio
                 //------------------------------------------------------------   
                 Program.mainForm.VideoViewer.Image = RGBImage;
             }
+            //Reach this line connection is lost
+            UpdateVideo(ConnectionLost);
         }
     }
 }

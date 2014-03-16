@@ -9,20 +9,6 @@ namespace Rovio
 {
     class Mapping
     {
-
-        public float blockWidth;
-        public float blockHeightAtOnemeter;
-        public float blocksCurrentHeight;
-        public float distanceToWidthSightPathRatio;
-        public float imageWidth;
-        public float blockXLocation;
-        public float currentLocationX;
-        public float currentLocationY;
-
-
-        //========================
-
-
         //compass points
         private const int N = 90;
         private const int NE = 135;
@@ -33,22 +19,20 @@ namespace Rovio
         private const int W = 0;
         private const int NW = 45;
 
-        private Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
-        private const int numOfCellsWidth = 26;
-        private const int numOfCellsHeight = 30;
-        private const int cellSize = 10;
-        public Point RedBlockLocation;
+        public double blockWidth;
+        public double blockHeightAtOnemeter;
+        public double blocksCurrentHeight;
+        public double distanceToWidthSightPathRatio;
+        public double imageWidth;
+        public double blockXLocation;
 
-        //private Point[] GreenBlockLocation;
+        private Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
+
         public Point currentLocation;
         public int orientation;
 
         public Mapping()
         {
-            orientation = 90;
-            Point start = new Point(120, 190);
-            Point rotated = RotateLocation(start);
-            Console.WriteLine("Start Location = {0}     new Location = {1}",start,rotated);
         }
 
         public double sin(double angle)
@@ -70,10 +54,10 @@ namespace Rovio
             drawGrid(map);
             drawRedBlock(map);
             this.AddRovioIcon(map);
-            UpdateMap(map);
+            DrawMap(map);
         }
 
-        private Point RotateLocation(Point old) 
+        private Point RotateLocation(Point old)
         {
             double rotatedX = (old.X * cos(orientation)) + (old.Y * sin(orientation));
             double rotatedY = (-old.X * sin(orientation)) + old.Y * cos(orientation);
@@ -84,12 +68,12 @@ namespace Rovio
         private void AddRovioIcon(Bitmap m)
         {
             Graphics g = Graphics.FromImage(m);
-            int x = (currentLocation.X - ((robotIcon.Width)/2));
+            int x = (currentLocation.X - ((robotIcon.Width) / 2));
             int y = (currentLocation.Y - ((robotIcon.Height) / 2));
-            g.DrawImage(rotateImage(robotIcon, orientation), x,y);
+            g.DrawImage(rotateImage(robotIcon, orientation), x, y);
         }
 
-        private Bitmap rotateImage(Image image, float angle)
+        private Bitmap rotateImage(Image image, double angle)
         {
             //create a new empty bitmap to hold rotated image
             Bitmap rotatedBmp = new Bitmap(image.Width, image.Height);
@@ -102,7 +86,7 @@ namespace Rovio
             g.TranslateTransform((float)image.Width / 2, (float)image.Height / 2);
 
             //rotate the image
-            g.RotateTransform(angle);
+            g.RotateTransform((float)angle);
 
             //move the image back
             g.TranslateTransform(-(float)image.Width / 2, -(float)image.Height / 2);
@@ -115,6 +99,10 @@ namespace Rovio
 
         private void drawGrid(Bitmap m)
         {
+            int numOfCellsWidth = 26;
+            int numOfCellsHeight = 30;
+            int cellSize = 10;
+
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.Black);
             for (int y = 0; y <= numOfCellsHeight; ++y)
@@ -139,32 +127,30 @@ namespace Rovio
         {
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.Red);
-            float dist=1.0f;
-            currentLocationX = (float) currentLocation.X;
-            currentLocationY = (float) currentLocation.Y;
+            double dist = 1.0f;
 
             if (blocksCurrentHeight != 0)
             {
                 dist = ((25.0f / blocksCurrentHeight) * 100f);
             }
 
-            float a = ((dist * 0.92f));
+            double a = ((dist * 0.92));
             a = ((imageWidth) / a);
-            a = (((blockWidth / 2.0f) + (blockXLocation)) / a);
+            a = (((blockWidth / 2.0) + (blockXLocation)) / a);
 
-            float row = 0;
+            double row = 0;
 
             if (((blockWidth / 2.0f) + (blockXLocation)) <= (imageWidth / 2))
             {
-                row = (currentLocationX - (((dist * 0.92f) / 2.0f) - a));
+                row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
             }
             else
             {
-                row = (currentLocationX + (((dist * 0.92f) / 2.0f) - ((dist * 0.92f) - a)));
+                row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
             }
 
-            float col = (currentLocationY - dist);
-            g.FillRectangle(new SolidBrush(Color.Red), row, col, 10, 10);
+            double col = (currentLocation.Y - dist);
+            g.FillRectangle(new SolidBrush(Color.Red), (float)row, (float)col, 10, 10);
         }
 
         private void drawGreenBlocks(Bitmap m, Point block)
@@ -174,12 +160,12 @@ namespace Rovio
 
         }
 
-        public void UpdateMap(System.Drawing.Image image)
+        private void DrawMap(System.Drawing.Image image)
         {
 
             if (Program.mainForm.InvokeRequired)
             {
-                Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { UpdateMap(image); }));
+                Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { DrawMap(image); }));
             }
             else
             {
@@ -187,6 +173,6 @@ namespace Rovio
             }
         }
 
-        public delegate void mapImageReady(System.Drawing.Image image);
+        private delegate void mapImageReady(System.Drawing.Image image);
     }
 }
