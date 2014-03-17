@@ -20,20 +20,39 @@ namespace Rovio
         protected const int YELLOW = 3;
         protected const int BLUE = 4;
 
-        //protected System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 8);
-        //protected float x = 10.0F;
-        //protected float y = 10.0F;
-        //protected System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
-        
+        public Mapping map;
+        protected System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 8);
+        protected float x = 10.0F;
+        protected float y = 10.0F;
+        protected System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
         protected Bitmap[] FilteredImage;
-        public Mapping map = new Mapping();
         protected volatile bool run;
 
-        protected BaseRobot(string address, string user, string password) : base(address, user, password) 
+        protected BaseRobot(string address, string user, string password, Mapping _map)
+            : base(address, user, password)
         {
+            map = _map;
             run = true;
         }
-        
+
+        public abstract void runRovio();
+
+        public void terminateRovio()
+        {
+            run = false;
+        }
+
+        protected void UpdateVideo(System.Drawing.Image image)
+        {
+            if (Program.mainForm.InvokeRequired)
+            {
+                Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { UpdateVideo(image); }));
+            }
+            else
+            {
+                Program.mainForm.VideoViewer.Image = image;
+            }
+        }
 
         protected bool checkConnection()
         {
@@ -50,11 +69,8 @@ namespace Rovio
 
         protected Bitmap getImage()
         {
-            map.Draw();
             return this.Camera.Image;
         }
-
-        public abstract void runRovio();
 
         protected Bitmap[] colourFilter(Bitmap image)
         {
@@ -107,6 +123,13 @@ namespace Rovio
             UpdateVideo(ExtractRedFeatures(filtered[RED]));
         }
 
+        protected void ActionPlanning(Bitmap[] info)
+        {
+
+        }
+
+        private delegate void videoImageReady(System.Drawing.Image image);
+
         private Bitmap ExtractRedFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
@@ -130,22 +153,23 @@ namespace Rovio
             toReturn.RedBlockHeight = biggest.Height;
             toReturn.RedBlockWidth = biggest.Width;
             toReturn.RedBlockDistance = (25.0f / biggest.Height);
+
+            //Needs to be placed in a stats object and passed to the map to be processed
             //===============================================================
-             this.map.blockWidth = biggest.Width;
-             this.map.blockHeightAtOnemeter = 25.0f;
-             this.map.blocksCurrentHeight = biggest.Height;
-             this.map.distanceToWidthSightPathRatio = 0.92f;
-             this.map.imageWidth = Filtered.Width;
-             this.map.blockXLocation = biggest.X;
+            // this.map.blockWidth = biggest.Width;
+            // this.map.blockHeightAtOnemeter = 25.0f;
+            // this.map.blocksCurrentHeight = biggest.Height;
+            // this.map.distanceToWidthSightPathRatio = 0.92f;
+            // this.map.imageWidth = Filtered.Width;
+            // this.map.blockXLocation = biggest.X;
             //==============================================================
-
-
-
-            string objectString = (25.0f / biggest.Height).ToString("#.##");
+            map.Draw();
+            //User Feedback
+            string objectString = Math.Round((25.0f / biggest.Height), 2).ToString();
             string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
             g.DrawRectangle(new Pen(Color.Blue), biggest);
-            //g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
-            //g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
             return Filtered;
         }
 
@@ -177,53 +201,9 @@ namespace Rovio
             string objectString = (25.0f / biggest.Height).ToString("#.##");
             string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (Filtered.Width / 2));
             g.DrawRectangle(new Pen(Color.Blue), biggest);
-           // g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            // g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
             //g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
             return Filtered;
         }
-
-        public Bitmap DetectCorners(Bitmap image)
-        {
-            Graphics graphics = Graphics.FromImage(image);
-            Pen pen = new Pen(new SolidBrush(Color.Red));
-
-            // Create corner detector and have it process the image
-            MoravecCornersDetector mcd = new MoravecCornersDetector();
-            List<IntPoint> corners = mcd.ProcessImage(image);
-
-            // Visualization: Draw 3x3 boxes around the corners
-            foreach (IntPoint corner in corners)
-            {
-                graphics.DrawRectangle(pen, corner.X - 1, corner.Y - 1, 3, 3);
-            }
-
-            // Display
-            return image;
-        }
-
-        protected void ActionPlanning(Bitmap[] info)
-        {
-
-        }
-
-        public delegate void videoImageReady(System.Drawing.Image image);
-
-        public void UpdateVideo(System.Drawing.Image image)
-        {
-            if (Program.mainForm.InvokeRequired)
-            {
-                Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { UpdateVideo(image); }));
-            }
-            else
-            {
-                Program.mainForm.VideoViewer.Image = image;
-            }
-        }
-
-        public void terminateRovio()
-        {
-            run = false;
-        }
-    
     }
 }

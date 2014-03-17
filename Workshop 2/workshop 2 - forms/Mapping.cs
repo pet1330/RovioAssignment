@@ -4,20 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
+using AForge.Imaging.Filters;
 
 namespace Rovio
 {
-    class Mapping
+    public class Mapping
     {
-        //compass points
-        private const int N = 90;
-        private const int NE = 135;
-        private const int E = 180;
-        private const int SE = 225;
-        private const int S = 270;
-        private const int SW = 315;
-        private const int W = 0;
-        private const int NW = 45;
+        private const int E = 90;
+        private const int SE = 135;
+        private const int S = 180;
+        private const int SW = 225;
+        private const int W = 270;
+        private const int NW = 315;
+        private const int N = 0;
+        private const int NE = 45;
+
+        private static int mapWidth = 260;
+        private static int mapHeight = 300;
+        int cellSize = 10;
+        private static double[] mapData = new double[(mapWidth * mapHeight)];
+
+        private static Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
 
         public double blockWidth;
         public double blockHeightAtOnemeter;
@@ -26,35 +33,76 @@ namespace Rovio
         public double imageWidth;
         public double blockXLocation;
 
-        private Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
-
-        public Point currentLocation;
+        public static Point currentLocation;
         public int orientation;
 
         public Mapping()
         {
-        }
-
-        public double sin(double angle)
-        {
-            return Math.Sin((angle * (Math.PI / 180)));
-        }
-
-        public double cos(double angle)
-        {
-            return Math.Cos((angle * (Math.PI / 180)));
+            currentLocation = new Point(100, 100);
+            orientation = N;
         }
 
         public void Draw()
         {
+            //Create Blank map
             Bitmap map = new Bitmap(260, 300);
-            Graphics gfx = Graphics.FromImage(map);
+            Graphics g = Graphics.FromImage(map);
             SolidBrush brush = new SolidBrush(Color.White);
-            gfx.FillRectangle(brush, 0, 0, 260, 300);
+            g.FillRectangle(brush, 0, 0, 260, 300);
+            annotate(map);
             drawGrid(map);
             drawRedBlock(map);
-            this.AddRovioIcon(map);
-            DrawMap(map);
+            shapeMap(map);
+            this.addRovioIcon(map);
+            drawMapToScreen(map);
+        }
+
+        public void updateMap()
+        { 
+        
+        }
+
+        private void shapeMap(Bitmap m) 
+        {
+            Graphics g = Graphics.FromImage(m);
+            SolidBrush brush = new SolidBrush(Color.Black);
+            g.FillRectangle(brush, 0, 0, 30, 100);
+            g.FillRectangle(brush, m.Width - 30, 0, 30, 100);
+            g.FillRectangle(brush, 0, m.Height - 100, 30, 100);
+            g.FillRectangle(brush, m.Width - 30, m.Height - 100, 30, 100);
+        }
+
+        private void annotate(Bitmap m)
+        {
+
+            Graphics g = Graphics.FromImage(m);
+            Pen p = new Pen(Color.Red);
+
+
+            for (int x = 0; x <= mapWidth; ++x)
+            {
+                for (int y = 0; y <= mapHeight; ++y)
+                {
+                    int value = Convert.ToInt32(255- ((get(x, y) / 255)));
+                    p.Color = Color.FromArgb(value, value, value);
+                    g.DrawRectangle(p, x, y, 1, 1);
+                }
+            }
+        }
+
+        private double tan(double angle)
+        {
+            return Math.Tan((angle * (Math.PI / 180)));
+        }
+
+        private double sin(double angle)
+        {
+            return Math.Sin((angle * (Math.PI / 180)));
+        }
+
+        private double cos(double angle)
+        {
+            return Math.Cos((angle * (Math.PI / 180)));
         }
 
         private Point RotateLocation(Point old)
@@ -65,7 +113,7 @@ namespace Rovio
             return toReturn;
         }
 
-        private void AddRovioIcon(Bitmap m)
+        private void addRovioIcon(Bitmap m)
         {
             Graphics g = Graphics.FromImage(m);
             int x = (currentLocation.X - ((robotIcon.Width) / 2));
@@ -99,28 +147,17 @@ namespace Rovio
 
         private void drawGrid(Bitmap m)
         {
-            int numOfCellsWidth = 26;
-            int numOfCellsHeight = 30;
-            int cellSize = 10;
-
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.Black);
-            for (int y = 0; y <= numOfCellsHeight; ++y)
+            for (int y = 0; y <= (mapHeight / cellSize); ++y)
             {
-                g.DrawLine(p, 0, y * cellSize, numOfCellsWidth * cellSize, y * cellSize);
+                g.DrawLine(p, 0, y * cellSize, (mapWidth / cellSize) * cellSize, y * cellSize);
             }
 
-            for (int x = 0; x <= numOfCellsWidth; ++x)
+            for (int x = 0; x <= (mapWidth / cellSize); ++x)
             {
-                g.DrawLine(p, x * cellSize, 0, x * cellSize, numOfCellsHeight * cellSize);
-
+                g.DrawLine(p, x * cellSize, 0, x * cellSize, (mapHeight / cellSize) * cellSize);
             }
-
-            g.FillRectangle(new SolidBrush(Color.Black), 0, 0, 30, 100);
-            g.FillRectangle(new SolidBrush(Color.Black), m.Width - 30, 0, 30, 100);
-            g.FillRectangle(new SolidBrush(Color.Black), 0, m.Height - 100, 30, 100);
-            g.FillRectangle(new SolidBrush(Color.Black), m.Width - 30, m.Height - 100, 30, 100);
-
         }
 
         private void drawRedBlock(Bitmap m)
@@ -149,8 +186,17 @@ namespace Rovio
                 row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
             }
 
-            double col = (currentLocation.Y - dist);
+
+            double realDist = Math.Sqrt(Math.Pow(dist, 2) + Math.Pow(a, 2));
+
+            double col = (currentLocation.Y - realDist);
+
+
             g.FillRectangle(new SolidBrush(Color.Red), (float)row, (float)col, 10, 10);
+
+
+
+
         }
 
         private void drawGreenBlocks(Bitmap m, Point block)
@@ -160,12 +206,12 @@ namespace Rovio
 
         }
 
-        private void DrawMap(System.Drawing.Image image)
+        private void drawMapToScreen(System.Drawing.Image image)
         {
 
             if (Program.mainForm.InvokeRequired)
             {
-                Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { DrawMap(image); }));
+                Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { drawMapToScreen(image); }));
             }
             else
             {
@@ -174,5 +220,26 @@ namespace Rovio
         }
 
         private delegate void mapImageReady(System.Drawing.Image image);
+
+        public double get(Point toGet)
+        {
+            return get(toGet.X, toGet.Y);
+        }
+
+        public void set(Point toSet, double input)
+        {
+            set(toSet.X, toSet.Y, input);
+        }
+
+        public double get(int x, int y)
+        {
+            return mapData[((x * mapWidth) + y)];
+        }
+
+        public void set(int x, int y, double input)
+        {
+            mapData[((x * mapWidth) + y)] = input;
+        }
+
     }
 }

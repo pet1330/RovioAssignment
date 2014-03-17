@@ -83,7 +83,7 @@ namespace Rovio
         /// <returns>Response stream.</returns>
         public Stream StreamRequest(string request)
         {
-            return web_client.OpenRead(web_client.BaseAddress + request);
+                return web_client.OpenRead(web_client.BaseAddress + request);   
         }
 
         /// <summary>

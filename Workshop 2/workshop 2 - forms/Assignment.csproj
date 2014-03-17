@@ -147,22 +147,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Map.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SmallRobot.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Map.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Robot.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SmallestRobot.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\SmallMap.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\TinyRobot.png" />
