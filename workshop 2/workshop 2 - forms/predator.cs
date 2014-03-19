@@ -31,12 +31,13 @@ namespace Rovio
                     //------------------------------------------------------------
                     FilteredImage = colourFilter(RGBImage);
 
+                    Console.WriteLine(map.probabilisticMap(150, 150, true));
+
                     //FeatureExtract
                     //------------------------------------------------------------
                     // RGBImage = DetectCorners(FilteredImage[RED]);
                     ExtractFeatrures(FilteredImage);
                     //------------------------------------------------------------
-
                     // Output to Screen
                     //------------------------------------------------------------   
                    // UpdateVideo(RGBImage);

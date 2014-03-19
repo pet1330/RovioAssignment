@@ -39,9 +39,6 @@ namespace Rovio
 
         public Mapping()
         {
-            currentLocation = new Point(100, 100);
-            orientation = N;
-            Random rand = new Random();
             for (int i = 0; i < mapHeight; i++)
             {
                 for (int j = 0; j < mapWidth; j++)
@@ -53,16 +50,10 @@ namespace Rovio
                             mapData[((i * mapWidth) + j)] = 1;
                         }
                     }
+                    set(i, j, 0.5);
                 }
             }
-
-            List<PathElement> path = AStar(new Point(130, 130), new Point(245, 290));
-
-            foreach (PathElement pe in path)
-            {
-                set(pe.xPos, pe.yPos, 1);
-            }
-
+            currentLocation = new Point(100, 100);
             Draw();
         }
 
@@ -113,6 +104,42 @@ namespace Rovio
             {
                 mapData[((x * mapWidth) + y)] = input;
             }
+        }
+
+        private double statesProbability(bool world, bool sensor)
+        {
+            if (world && sensor)
+            {
+                return 0.6;
+            }
+            else if (world && !sensor)
+            {
+                return 0.4;
+            }
+            else if (!world && sensor)
+            {
+                return 0.2;
+            }
+            else //if (!world && !sensor)
+            {
+                return 0.8;
+            }
+        }
+
+        public double probabilisticMap(int x,int y,bool sensor)
+        {
+            double  mapProb = get(x,y);
+            bool world = (mapProb < threshold);
+
+            double newProb = 
+                
+                        (statesProbability(world, sensor) * mapProb) 
+                                          / 
+((statesProbability(world, sensor) * mapProb) + (statesProbability(!world, sensor) * (1 - mapProb)));
+            
+            
+            set(x,y,newProb);
+            return newProb;
         }
 
         private void annotate(Bitmap m)
@@ -329,11 +356,11 @@ namespace Rovio
 
                         if (xDiff == 1 && yDiff == 1)
                         {
-                            direction += 14;
+                            direction = 14;
                         }
                         else
                         {
-                            direction += 10;
+                            direction = 10;
                         }
 
                         //find Hueristic 
@@ -381,7 +408,7 @@ namespace Rovio
                     }
                 }
             }
-            return finalList;
+            return null;
         }
 
         class PathElement
