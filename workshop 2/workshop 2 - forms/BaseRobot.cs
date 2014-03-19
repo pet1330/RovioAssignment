@@ -8,11 +8,15 @@ using AForge;
 using System.Collections.Concurrent;
 using AForge.Imaging.Filters;
 using AForge.Imaging;
+using System.Drawing.Imaging;
+using AForge.Math.Geometry;
 
 namespace Rovio
 {
     abstract class BaseRobot : Robot
     {
+        //Image adapted from http://www.google.com/images/errors/robot.png
+        //This images was created and belongs to Google
         protected Bitmap ConnectionLost = global::Rovio.Properties.Resources.ConnectionLost;
         protected const int RED = 0;
         protected const int GREEN = 1;
@@ -90,7 +94,7 @@ namespace Rovio
                     case GREEN:
                         filt.Hue = new IntRange(90, 115);
                         filt.Saturation = new Range(0.3f, 1.0f);
-                        filt.Luminance = new Range(0.15f, 1.0f);
+                        filt.Luminance = new Range(0.15f, 0.9f);
                         break;
                     case WHITE:
                         filt.Hue = new IntRange(181, 180);
@@ -121,7 +125,10 @@ namespace Rovio
 
         protected void ExtractFeatrures(Bitmap[] filtered)
         {
-            UpdateVideo(ExtractRedFeatures(filtered[RED]));
+            //UpdateVideo(ExtractRedFeatures(filtered[RED]));
+            //UpdateVideo(
+            ExtractGreenFeatures(filtered[GREEN]);//);
+            
         }
 
         protected void ActionPlanning(Bitmap[] info)
@@ -164,7 +171,7 @@ namespace Rovio
             // this.map.imageWidth = Filtered.Width;
             // this.map.blockXLocation = biggest.X;
             //==============================================================
-            map.Draw();
+            //map.Draw();
             //User Feedback
             string objectString = Math.Round((25.0f / biggest.Height), 2).ToString();
             string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
@@ -177,9 +184,9 @@ namespace Rovio
         private Bitmap ExtractGreenFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
-            bc.MinHeight = 15;
+            Stats toReturn = new Stats(GREEN);
             bc.MinWidth = 15;
-
+            bc.MinHeight = 15;
             bc.FilterBlobs = true;
             bc.ObjectsOrder = ObjectsOrder.Size;
             bc.ProcessImage(Filtered);
@@ -187,24 +194,116 @@ namespace Rovio
             Rectangle biggest = new Rectangle(0, 0, 0, 0);
             Graphics g = Graphics.FromImage(Filtered);
 
-            foreach (Rectangle r in rects)
+            if ((rects.Length > 0) && (rects[0].Height > 0))
             {
                 biggest = rects[0];
             }
 
-            Stats toReturn = new Stats(GREEN);
             toReturn.RedBlockDetected = true;
             toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
             toReturn.RedBlockHeight = biggest.Height;
             toReturn.RedBlockWidth = biggest.Width;
-            toReturn.RedBlockDistance = (25.0f / biggest.Height);
+            toReturn.RedBlockDistance = (130.0f / biggest.Height);
 
-            string objectString = (25.0f / biggest.Height).ToString("#.##");
-            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X - (Filtered.Width / 2));
+            //Needs to be placed in a stats object and passed to the map to be processed
+            //===============================================================
+            // this.map.blockWidth = biggest.Width;
+            // this.map.blockHeightAtOnemeter = 130.0f;
+            // this.map.blocksCurrentHeight = biggest.Height;
+            // this.map.distanceToWidthSightPathRatio = 0.92f;
+            // this.map.imageWidth = Filtered.Width;
+            // this.map.blockXLocation = biggest.X;
+            //==============================================================
+            //map.Draw();
+            //User Feedback
+            string objectString = Math.Round((130.0f / biggest.Height), 2).ToString();
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X);
             g.DrawRectangle(new Pen(Color.Blue), biggest);
-            // g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
-            //g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
             return Filtered;
+        }
+
+        private Bitmap ExtractBlueFeatures(Bitmap Filtered)
+        {
+
+            // locate objects using blob counter
+            BlobCounter blobCounter = new BlobCounter();
+            blobCounter.ProcessImage(Filtered);
+            Blob[] blobs = blobCounter.GetObjectsInformation();
+            // create Graphics object to draw on the image and a pen
+            Graphics g = Graphics.FromImage(Filtered);
+            Pen bluePen = new Pen(Color.Blue, 2);
+            // check each object and draw circle around objects, which
+            // are recognized as circles
+            for (int i = 0, n = blobs.Length; i < n; i++)
+            {
+                List<IntPoint> edgePoints = blobCounter.GetBlobsEdgePoints(blobs[i]);
+                List<IntPoint> corners = PointsCloud.FindQuadrilateralCorners(edgePoints);
+
+                g.DrawPolygon(bluePen, ToPointsArray(corners));
+            }
+
+            bluePen.Dispose();
+            g.Dispose();
+            UpdateVideo(Filtered);
+            return Filtered;
+
+            /*
+
+            BlobCounter bc = new BlobCounter();
+            Stats toReturn = new Stats(BLUE);
+            bc.MinWidth = 15;
+            bc.MinHeight = 15;
+            bc.FilterBlobs = true;
+            bc.ObjectsOrder = ObjectsOrder.Size;
+            bc.ProcessImage(Filtered);
+            Rectangle[] rects = bc.GetObjectsRectangles();
+            Rectangle biggest = new Rectangle(0, 0, 0, 0);
+            Graphics g = Graphics.FromImage(Filtered);
+
+            if ((rects.Length > 0) && (rects[0].Height > 0))
+            {
+                biggest = rects[0];
+            }
+
+            toReturn.RedBlockDetected = true;
+            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+            toReturn.RedBlockHeight = biggest.Height;
+            toReturn.RedBlockWidth = biggest.Width;
+            toReturn.RedBlockDistance = (130.0f / biggest.Height);
+
+            //Needs to be placed in a stats object and passed to the map to be processed
+            //===============================================================
+            // this.map.blockWidth = biggest.Width;
+            // this.map.blockHeightAtOnemeter = 130.0f;
+            // this.map.blocksCurrentHeight = biggest.Height;
+            // this.map.distanceToWidthSightPathRatio = 0.92f;
+            // this.map.imageWidth = Filtered.Width;
+            // this.map.blockXLocation = biggest.X;
+            //==============================================================
+            //map.Draw();
+            //User Feedback
+            string objectString = Math.Round((130.0f / biggest.Height), 2).ToString();
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X);
+            g.DrawRectangle(new Pen(Color.Blue), biggest);
+            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+            return Filtered;
+
+            */
+        }
+
+        private System.Drawing.Point[] ToPointsArray(List<IntPoint> points)
+        {
+            System.Drawing.Point[] array = new System.Drawing.Point[points.Count];
+
+            for (int i = 0, n = points.Count; i < n; i++)
+            {
+                array[i] = new System.Drawing.Point(points[i].X, points[i].Y);
+            }
+
+            return array;
         }
     }
 }

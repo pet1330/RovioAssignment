@@ -43,9 +43,9 @@ namespace Rovio
             {
                 for (int j = 0; j < mapWidth; j++)
                 {
-                    if (i <= 30 || i > 230)
+                    if (i < 30 || i >= 229)
                     {
-                        if (j <= 100 || j > 200)
+                        if (j < 100 || j >= 199)
                         {
                             mapData[((i * mapWidth) + j)] = 1;
                         }
@@ -67,7 +67,7 @@ namespace Rovio
             annotate(map);
             //drawGrid(map);
             drawRedBlock(map);
-            this.addRovioIcon(map);
+           //addRovioIcon(map);
             drawMapToScreen(map);
         }
 
@@ -93,9 +93,9 @@ namespace Rovio
 
         public void set(int x, int y, double input)
         {
-            if (x <= 30 || x > 230)
+            if (x < 30 || x >= 229)
             {
-                if (y <= 100 || y > 200)
+                if (y < 100 || y >= 199)
                 {
                     return;
                 }
@@ -131,12 +131,7 @@ namespace Rovio
             double  mapProb = get(x,y);
             bool world = (mapProb < threshold);
 
-            double newProb = 
-                
-                        (statesProbability(world, sensor) * mapProb) 
-                                          / 
-((statesProbability(world, sensor) * mapProb) + (statesProbability(!world, sensor) * (1 - mapProb)));
-            
+            double newProb = (statesProbability(world, sensor) * mapProb) /((statesProbability(world, sensor) * mapProb) + (statesProbability(!world, sensor) * (1 - mapProb)));
             
             set(x,y,newProb);
             return newProb;
