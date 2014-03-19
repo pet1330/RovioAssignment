@@ -12,8 +12,8 @@ namespace Rovio
 {
     class predator : BaseRobot
     {
-        public predator(string address, string user, string password, Mapping _map)
-            : base(address, user, password,_map)
+        public predator(string address, string user, string password)
+            : base(address, user, password)
         {
         }
 

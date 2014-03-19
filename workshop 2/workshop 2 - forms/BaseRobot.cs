@@ -25,14 +25,15 @@ namespace Rovio
         protected float x = 10.0F;
         protected float y = 10.0F;
         protected System.Drawing.StringFormat drawFormat = new System.Drawing.StringFormat();
+
         protected Bitmap[] FilteredImage;
         protected volatile bool run;
 
-        protected BaseRobot(string address, string user, string password, Mapping _map)
+        protected BaseRobot(string address, string user, string password)
             : base(address, user, password)
         {
-            map = _map;
             run = true;
+            map = new Mapping();
         }
 
         public abstract void runRovio();

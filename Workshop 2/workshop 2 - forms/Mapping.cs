@@ -21,9 +21,9 @@ namespace Rovio
 
         private static int mapWidth = 260;
         private static int mapHeight = 300;
-        int cellSize = 10;
-        private static double[] mapData = new double[(mapWidth * mapHeight)];
+        private int cellSize = 10;
 
+        private static double[] mapData = new double[(mapWidth * mapHeight)];
         private static Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
 
         public double blockWidth;
@@ -35,11 +35,35 @@ namespace Rovio
 
         public static Point currentLocation;
         public int orientation;
+        double threshold = 0.75;
 
         public Mapping()
         {
             currentLocation = new Point(100, 100);
             orientation = N;
+            Random rand = new Random();
+            for (int i = 0; i < mapHeight; i++)
+            {
+                for (int j = 0; j < mapWidth; j++)
+                {
+                    if (i <= 30 || i > 230)
+                    {
+                        if (j <= 100 || j > 200)
+                        {
+                            mapData[((i * mapWidth) + j)] = 1;
+                        }
+                    }
+                }
+            }
+
+            List<PathElement> path = AStar(new Point(130, 130), new Point(245, 290));
+
+            foreach (PathElement pe in path)
+            {
+                set(pe.xPos, pe.yPos, 1);
+            }
+
+            Draw();
         }
 
         public void Draw()
@@ -50,49 +74,62 @@ namespace Rovio
             SolidBrush brush = new SolidBrush(Color.White);
             g.FillRectangle(brush, 0, 0, 260, 300);
             annotate(map);
-            drawGrid(map);
+            //drawGrid(map);
             drawRedBlock(map);
-            shapeMap(map);
             this.addRovioIcon(map);
             drawMapToScreen(map);
         }
 
-        public void updateMap()
-        { 
-        
+        public void statsInfoUpdate()
+        {
+
         }
 
-        private void shapeMap(Bitmap m) 
+        public double get(Point toGet)
         {
-            Graphics g = Graphics.FromImage(m);
-            SolidBrush brush = new SolidBrush(Color.Black);
-            g.FillRectangle(brush, 0, 0, 30, 100);
-            g.FillRectangle(brush, m.Width - 30, 0, 30, 100);
-            g.FillRectangle(brush, 0, m.Height - 100, 30, 100);
-            g.FillRectangle(brush, m.Width - 30, m.Height - 100, 30, 100);
+            return get(toGet.X, toGet.Y);
+        }
+
+        public void set(Point toSet, double input)
+        {
+            set(toSet.X, toSet.Y, input);
+        }
+
+        public double get(int x, int y)
+        {
+            return mapData[((x * mapWidth) + y)];
+        }
+
+        public void set(int x, int y, double input)
+        {
+            if (x <= 30 || x > 230)
+            {
+                if (y <= 100 || y > 200)
+                {
+                    return;
+                }
+            }
+            if (input >= 0 && input <= 1)
+            {
+                mapData[((x * mapWidth) + y)] = input;
+            }
         }
 
         private void annotate(Bitmap m)
         {
-
             Graphics g = Graphics.FromImage(m);
-            Pen p = new Pen(Color.Red);
-
-
+            Pen p = new Pen(Color.White);
+            
             for (int x = 0; x <= mapWidth; ++x)
             {
                 for (int y = 0; y <= mapHeight; ++y)
                 {
-                    int value = Convert.ToInt32(255- ((get(x, y) / 255)));
+                    int value = Convert.ToInt32(255 - ((get(x, y) * 255)));
+
                     p.Color = Color.FromArgb(value, value, value);
                     g.DrawRectangle(p, x, y, 1, 1);
                 }
             }
-        }
-
-        private double tan(double angle)
-        {
-            return Math.Tan((angle * (Math.PI / 180)));
         }
 
         private double sin(double angle)
@@ -221,25 +258,169 @@ namespace Rovio
 
         private delegate void mapImageReady(System.Drawing.Image image);
 
-        public double get(Point toGet)
+        private List<PathElement> AStar(Point Pstart, Point Pend)
         {
-            return get(toGet.X, toGet.Y);
+            PathElement start = new PathElement(Pstart.X, Pstart.Y);
+            PathElement end = new PathElement(Pend.X, Pend.Y);
+
+            List<PathElement> openList = new List<PathElement>();
+            List<PathElement> closeList = new List<PathElement>();
+            List<PathElement> finalList = new List<PathElement>();
+            openList.Add(start);
+
+            while (openList.Count != 0)
+            {
+                //Sort by lowest F cost
+                openList = openList.OrderBy(o => o.F()).ToList();
+                //select first element
+                PathElement selected = openList.First();
+                closeList.Add(selected);
+                openList.Remove(selected);
+
+                for (int ii = -1; ii <= 1; ii++)
+                {
+                    for (int jj = -1; jj <= 1; jj++)
+                    {
+                        //sets which element we're looking at
+                        int currentX = selected.xPos + ii;
+                        int currentY = selected.yPos + jj;
+
+                        //check we've not found the target
+                        if (currentX == end.xPos && currentY == end.yPos)
+                        {
+                            finalList.Add(end);
+                            while (selected.parent != null)
+                            {
+                                finalList.Add(selected);
+                                selected = selected.parent;
+                            }
+                            finalList.Add(start);
+                            finalList.Reverse();
+                            return finalList;
+                        }
+
+                        //check we're still within the board
+                        if (currentX < 0)
+                        {
+                            continue;
+                        }
+                        if (currentX > mapWidth)
+                        {
+                            continue;
+                        }
+                        if (currentY < 0)
+                        {
+                            continue;
+                        }
+                        if (currentY > mapHeight)
+                        {
+                            continue;
+                        }
+
+                        //ignore walls
+                        if (get(currentY, currentX) > threshold)
+                        {
+                            continue;
+                        }
+                        int xDiff = Math.Abs(currentX - (selected.xPos));
+                        int yDiff = Math.Abs(currentY - (selected.yPos));
+
+                        int direction = 0;
+
+                        if (xDiff == 1 && yDiff == 1)
+                        {
+                            direction += 14;
+                        }
+                        else
+                        {
+                            direction += 10;
+                        }
+
+                        //find Hueristic 
+                        int xh = Math.Abs(currentX - end.xPos);
+                        int yh = Math.Abs(currentY - end.yPos);
+                        int H = 10 * (xh + yh);
+                        int G = selected.G + direction;
+                        bool onOpenList = false;
+
+                        foreach (PathElement it in openList)
+                        {
+                            if (currentX == it.xPos && currentY == it.yPos)
+                            {
+                                onOpenList = true;
+                                //check if parent needs to change
+                                if (selected.G + direction < it.G)
+                                {
+                                    //change parent
+                                    it.parent = selected;
+                                    //change G to new G
+                                    it.G = selected.G + direction;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!onOpenList)
+                        {
+                            bool closed = false;
+                            //check if element is on closed list
+                            foreach (PathElement it in closeList)
+                            {
+                                if (currentX == it.xPos && currentY == it.yPos)
+                                {
+                                    closed = true;
+                                }
+                            }
+                            //if on closed list
+                            if (closed)
+                                //ignore it
+                                continue;
+                            else
+                                //add element to openlist
+                                openList.Add(new PathElement(currentX, currentY, G, H, selected));
+                        }
+                    }
+                }
+            }
+            return finalList;
         }
 
-        public void set(Point toSet, double input)
+        class PathElement
         {
-            set(toSet.X, toSet.Y, input);
-        }
+            public int xPos;
+            public int yPos;
+            public int H;
+            public int G;
+            public PathElement parent;
 
-        public double get(int x, int y)
-        {
-            return mapData[((x * mapWidth) + y)];
-        }
+            public PathElement()
+            {
+                xPos = 0;
+                yPos = 0;
+                G = 0;
+                H = 0;
+            }
 
-        public void set(int x, int y, double input)
-        {
-            mapData[((x * mapWidth) + y)] = input;
-        }
+            public PathElement(int x, int y)
+            {
+                xPos = x;
+                yPos = y;
+                G = 0;
+                H = 0;
+            }
 
+            public PathElement(int x, int y, int g, int h, PathElement p)
+            {
+                xPos = x;
+                yPos = y;
+                G = g;
+                H = h;
+                parent = p;
+            }
+
+            public int F()
+            {
+                return (G + H);
+            }
+        }
     }
 }

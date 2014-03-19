@@ -10,8 +10,8 @@ namespace Rovio
 {
     class User : BaseRobot
     {
-        public User(string address, string user, string password, Mapping _map)
-            : base(address, user, password, _map)
+        public User(string address, string user, string password)
+            : base(address, user, password)
         {
         }
 

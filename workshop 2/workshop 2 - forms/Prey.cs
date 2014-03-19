@@ -12,8 +12,8 @@ namespace Rovio
 {
     class Prey : BaseRobot
     {
-        public Prey(string address, string user, string password, Mapping _map)
-            : base(address, user, password, _map) { }
+        public Prey(string address, string user, string password)
+            : base(address, user, password) { }
 
         public override void runRovio()
         {
