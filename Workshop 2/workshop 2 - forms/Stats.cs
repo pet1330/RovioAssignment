@@ -10,19 +10,55 @@ namespace Rovio
     {
         //RED BLOCK
         //---------------------------------------------------------------
-        int colour = 0;
+        int colour;
 
-        public bool RedBlockDetected = false;
+        #region Red Stats
+        public bool RedBlockDetected;
         public double RedBlockDistance;
-        public Point RedBlockCenterLocation = new Point(0, 0);
-        public int RedBlockHeight = 0;
-        public int RedBlockWidth = 0;
+        public Point RedBlockCenterLocation;
+        public int RedBlockHeight;
+        public int RedBlockWidth;
+        #endregion
 
-        public bool GreenBlockDetected = false;
-        public double GreenBlockDistance=0;
-        public Point GreenBlockCenterLocation = new Point(0, 0);
-        public int GreenBlockHeight = 0;
-        public int GreenBlockWidth = 0;
+        #region Green Stats
+        public bool GreenBlockDetected;
+        public double GreenBlockDistance;
+        public Point GreenBlockCenterLocation;
+        public int GreenBlockHeight;
+        public int GreenBlockWidth;
+        #endregion
+
+        #region BlueLine Stats
+        public bool BlueLineDetected;
+        public double[] BlueLineDistance;
+        public Point[] BlueLineLeftPoint;
+        public Point[] BlueLineRightPoint;
+        public int[] BlueLineThickness;
+        #endregion
+        
+        #region Yellow Wall Stats
+        public bool YellowWallDetected;
+        public double[] YellowWallClosestPointDistance;
+        public Point[] YellowWallTopLeftCorner;
+        public Point[] YellowWallBottomLeftCorner;
+        public Point[] YellowWallTopRightCorner;
+        public Point[] YellowWallBottomRightCorner;
+        public int[] YellowWallHeight;
+        public int[] YellowWallWidth;
+        #endregion
+
+        #region White Wall Stats
+        public bool WhiteWallDetected;
+        public double[] WhiteWallClosestPointDistance;
+        public Point[] WhiteWallTopLeftCorner;
+        public Point[] WhiteWallBottomLeftCorner;
+        public Point[] WhiteWallTopRightCorner;
+        public Point[] WhiteWallBottomRightCorner;
+        public int[] WhiteWallHeight;
+        public int[] WhiteWallWidth;
+        #endregion
+
+
 
         public Stats(int colourFilter)
         {

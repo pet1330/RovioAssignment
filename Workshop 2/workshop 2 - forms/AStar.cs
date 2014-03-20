@@ -8,7 +8,7 @@ namespace Rovio
 {
     class AStar
     {
-        public LinkedList<Point> finalPath;
+        public LinkedList<Point> path;
         private List<Point> openList;
         private AStarData[,] map;
         double thresh = 0.75;
@@ -16,7 +16,7 @@ namespace Rovio
 
         public AStar() 
         {
-        finalPath = new LinkedList<Point>();
+        path = new LinkedList<Point>();
         openList = new List<Point>();
          map = new AStarData[260,300];
         }
@@ -73,7 +73,7 @@ namespace Rovio
 
                 if (cost == float.MaxValue)
                 {
-                    finalPath.Clear();
+                    path.Clear();
                     return false;
                 }
                 else
@@ -83,9 +83,9 @@ namespace Rovio
 
                     if (map[destination.X, destination.Y].closed)
                     {
-                        finalPath.Clear();
+                        path.Clear();
                         Point nextClosed = destination;
-                        finalPath.AddFirst(nextClosed);
+                        path.AddFirst(nextClosed);
 
                         while (!done)
                         {
@@ -95,7 +95,7 @@ namespace Rovio
                             {
                                 return true;
                             }
-                            finalPath.AddFirst(nextClosed);
+                            path.AddFirst(nextClosed);
                         }
                     }
                 }

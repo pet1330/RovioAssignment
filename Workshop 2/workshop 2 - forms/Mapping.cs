@@ -277,17 +277,16 @@ namespace Rovio
 
             g.FillRectangle(new SolidBrush(Color.Red), (float)row, (float)col, 7, 4);
 
-            for (int i = 0; i < 7; i++)
+            for (int i = -3; i < 4; i++)
             {
-                for (int j = 0; j < 4; j++)
+                for (int j = -2; j < 2; j++)
                 {
                     probabilisticMap(Convert.ToInt32((row + i)), Convert.ToInt32((col + j)), true);
                 }
             }
 
-
             pathFinding.FindPath(currentLocation, new Point((int)row, (int)col));
-            foreach (Point loop in pathFinding.finalPath)
+            foreach (Point loop in pathFinding.path)
             {
                 set(loop.X, loop.Y, 1);
             }

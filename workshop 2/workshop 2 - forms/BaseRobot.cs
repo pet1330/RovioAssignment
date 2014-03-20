@@ -18,11 +18,11 @@ namespace Rovio
         //Image adapted from http://www.google.com/images/errors/robot.png
         //This images was created and belongs to Google
         protected Bitmap ConnectionLost = global::Rovio.Properties.Resources.ConnectionLost;
-        protected const int RED = 0;
-        protected const int GREEN = 1;
-        protected const int WHITE = 2;
-        protected const int YELLOW = 3;
-        protected const int BLUE = 4;
+        public const int RED = 0;
+        public const int GREEN = 1;
+        public const int WHITE = 2;
+        public const int YELLOW = 3;
+        public const int BLUE = 4;
 
         public Mapping map;
         protected System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 8);
@@ -208,6 +208,7 @@ namespace Rovio
             toReturn.RedBlockWidth = biggest.Width;
             toReturn.RedBlockDistance = (130.0f / biggest.Height);
 
+
             //Needs to be placed in a stats object and passed to the map to be processed
             //===============================================================
             // this.map.blockWidth = biggest.Width;
@@ -219,6 +220,7 @@ namespace Rovio
             //==============================================================
             //map.Draw();
             //User Feedback
+
             string objectString = Math.Round((130.0f / biggest.Height), 2).ToString();
             string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X);
             g.DrawRectangle(new Pen(Color.Blue), biggest);
