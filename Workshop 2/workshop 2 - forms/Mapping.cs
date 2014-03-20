@@ -25,6 +25,7 @@ namespace Rovio
 
         private static double[] mapData = new double[(mapWidth * mapHeight)];
         private static Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
+        AStar pathFinding = new AStar();
 
         public double blockWidth;
         public double blockHeightAtOnemeter;
@@ -35,7 +36,7 @@ namespace Rovio
 
         public static Point currentLocation;
         public int orientation;
-        double threshold = 1;
+        public static double threshold = 1;
 
         public Mapping()
         {
@@ -53,6 +54,13 @@ namespace Rovio
                     set(i, j, 0.5);
                 }
             }
+
+            for (int i = 0; i < mapWidth; i++)
+            {
+                set(i, 120, 1);
+            }
+
+
             //SET THE CURRENT LOCATION %CL
             currentLocation = new Point(100, 200);
             Draw();
@@ -65,8 +73,9 @@ namespace Rovio
             Graphics g = Graphics.FromImage(map);
             SolidBrush brush = new SolidBrush(Color.White);
             g.FillRectangle(brush, 0, 0, 260, 300);
+           
             annotate(map);
-            drawGrid(map);
+            //drawGrid(map);
             drawRedBlock(map);
             //drawGreenBlock(map);  //DOES NOT WORK YET
             addRovioIcon(map);
@@ -78,26 +87,36 @@ namespace Rovio
 
         }
 
-        public double get(Point toGet)
+        public static double get(Point toGet)
         {
             return get(toGet.X, toGet.Y);
         }
 
-        public void set(Point toSet, double input)
+        public static void set(Point toSet, double input)
         {
             set(toSet.X, toSet.Y, input);
         }
 
-        public double get(int x, int y)
+        public static double get(int x, int y)
         {
-            return mapData[((x * mapWidth) + y)];
-        }
+            if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight)
+                return 1;
 
-        public void set(int x, int y, double input)
-        {
             if (x < 30 || x >= 229)
             {
                 if (y < 100 || y >= 199)
+                {
+                    return 1;
+                }
+            }
+            return mapData[((x * mapWidth) + y)];
+        }
+
+        public static void set(int x, int y, double input)
+        {
+            if (x < 30 || x >= 230)
+            {
+                if (y < 100 || y >= 200)
                 {
                     return;
                 }
@@ -108,32 +127,30 @@ namespace Rovio
             }
         }
 
-        private double statesProbability(bool world, bool sensor)
+        private static double statesProbability(bool world, bool sensor)
         {
             if (world && sensor)
             {
-                return 0.6;
+                return 0.55;
             }
             else if (world && !sensor)
             {
-                return 0.4;
+                return 0.45;
             }
             else if (!world && sensor)
             {
-                return 0.2;
+                return 0.45;
             }
             else //if (!world && !sensor)
             {
-                return 0.8;
+                return 0.55;
             }
         }
-
-        public double probabilisticMap(int x,int y,bool sensor)
+         
+        public static double probabilisticMap(int x,int y,bool sensor)
         {
             double  mapProb = get(x,y);
             bool world = (mapProb < threshold);
-
-            //Console.WriteLine("" + (statesProbability(world, sensor) + " * " + mapProb +  "\n" + statesProbability(world, sensor) + " * " +  mapProb + "+" + statesProbability(!world, sensor) +  "*" +  (1 - mapProb)));
 
             double newProb = (statesProbability(world, sensor) * mapProb) /((statesProbability(world, sensor) * mapProb) + (statesProbability(!world, sensor) * ((1 - mapProb))));
 
@@ -255,11 +272,27 @@ namespace Rovio
             double realDist = Math.Sqrt(Math.Pow(dist, 2) + Math.Pow(a, 2));
 
             double col = (currentLocation.Y - realDist);
+            if (double.IsNaN(row) || double.IsNaN(col))
+                return;
 
             g.FillRectangle(new SolidBrush(Color.Red), (float)row, (float)col, 7, 4);
 
-        }
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    probabilisticMap(Convert.ToInt32((row + i)), Convert.ToInt32((col + j)), true);
+                }
+            }
 
+
+            pathFinding.FindPath(currentLocation, new Point((int)row, (int)col));
+            foreach (Point loop in pathFinding.finalPath)
+            {
+                set(loop.X, loop.Y, 1);
+            }
+        }
+        
         private void drawGreenBlock(Bitmap m)
         {
             Graphics g = Graphics.FromImage(m);
@@ -308,24 +341,55 @@ namespace Rovio
 
         private delegate void mapImageReady(System.Drawing.Image image);
 
-        private List<PathElement> AStar(Point Pstart, Point Pend)
+
+        /*
+        public List<PathElement> AStar(Point Pstart, Point Pend)
         {
             PathElement start = new PathElement(Pstart.X, Pstart.Y);
             PathElement end = new PathElement(Pend.X, Pend.Y);
 
             List<PathElement> openList = new List<PathElement>();
             List<PathElement> closeList = new List<PathElement>();
-            List<PathElement> finalList = new List<PathElement>();
+            
             openList.Add(start);
 
-            while (openList.Count != 0)
+            while (true)
             {
+                int tempF = int.MaxValue;
                 //Sort by lowest F cost
                 openList = openList.OrderBy(o => o.F()).ToList();
+
+                foreach (PathElement item in openList)
+                {
+                    if (item.F() < tempF)
+                    {
+                        tempF = item.F();
+                    }
+                }
+               
+                if (tempF == int.MaxValue)
+                    return null;
                 //select first element
                 PathElement selected = openList.First();
                 closeList.Add(selected);
                 openList.Remove(selected);
+
+                //check we've not found the target
+                if (selected.xPos == end.xPos && selected.yPos == end.yPos)
+                {
+                    List<PathElement> finalList = new List<PathElement>();
+                    finalList.Add(end);
+                    while (selected.parent != null)
+                    {
+                        finalList.Add(selected);
+                        selected = selected.parent;
+                    }
+                
+                    finalList.Add(start);
+                    finalList.Reverse();
+                    return finalList;
+                }
+
 
                 for (int ii = -1; ii <= 1; ii++)
                 {
@@ -334,20 +398,6 @@ namespace Rovio
                         //sets which element we're looking at
                         int currentX = selected.xPos + ii;
                         int currentY = selected.yPos + jj;
-
-                        //check we've not found the target
-                        if (currentX == end.xPos && currentY == end.yPos)
-                        {
-                            finalList.Add(end);
-                            while (selected.parent != null)
-                            {
-                                finalList.Add(selected);
-                                selected = selected.parent;
-                            }
-                            finalList.Add(start);
-                            finalList.Reverse();
-                            return finalList;
-                        }
 
                         //check we're still within the board
                         if (currentX < 0)
@@ -368,10 +418,11 @@ namespace Rovio
                         }
 
                         //ignore walls
-                        if (get(currentY, currentX) > threshold)
+                        if (get(currentY, currentX) > 0.6)
                         {
                             continue;
                         }
+
                         int xDiff = Math.Abs(currentX - (selected.xPos));
                         int yDiff = Math.Abs(currentY - (selected.yPos));
 
@@ -434,43 +485,14 @@ namespace Rovio
             return null;
         }
 
-        class PathElement
+
+        private int AStarHeuristics(Point start, Point end) 
         {
-            public int xPos;
-            public int yPos;
-            public int H;
-            public int G;
-            public PathElement parent;
-
-            public PathElement()
-            {
-                xPos = 0;
-                yPos = 0;
-                G = 0;
-                H = 0;
-            }
-
-            public PathElement(int x, int y)
-            {
-                xPos = x;
-                yPos = y;
-                G = 0;
-                H = 0;
-            }
-
-            public PathElement(int x, int y, int g, int h, PathElement p)
-            {
-                xPos = x;
-                yPos = y;
-                G = g;
-                H = h;
-                parent = p;
-            }
-
-            public int F()
-            {
-                return (G + H);
-            }
+            int xh = Math.Abs(start.X - end.X);
+            int yh = Math.Abs(start.Y - end.Y);
+            return (10 * (xh + yh));
         }
+        */
+
     }
 }

@@ -66,9 +66,6 @@
     <Reference Include="AForge.Imaging.Formats">
       <HintPath>..\aforge.net framework-2.2.4\Release\AForge.Imaging.Formats.dll</HintPath>
     </Reference>
-    <Reference Include="AForge.Imaging.IPPrototyper">
-      <HintPath>..\aforge.net framework-2.2.4\Release\AForge.Imaging.IPPrototyper.dll</HintPath>
-    </Reference>
     <Reference Include="AForge.Math">
       <HintPath>..\aforge.net framework-2.2.4\Release\AForge.Math.dll</HintPath>
     </Reference>
@@ -89,6 +86,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AStar.cs" />
     <Compile Include="ColourFilters.cs" />
     <Compile Include="Mapping.cs" />
     <Compile Include="Prey.cs" />

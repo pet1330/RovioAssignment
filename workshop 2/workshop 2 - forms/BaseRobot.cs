@@ -129,8 +129,8 @@ namespace Rovio
            // ExtractGreenFeatures(filtered[GREEN]);
            // ExtractYellowFeatures(filtered[YELLOW]);
            // ExtractWhiteFeatures(filtered[WHITE]);
-            ExtractRedFeatures(filtered[RED]);
-            UpdateVideo(ExtractGreenFeatures(filtered[GREEN]));
+            UpdateVideo(ExtractRedFeatures(filtered[RED]));
+            ExtractGreenFeatures(filtered[GREEN]);
         }
 
         protected void ActionPlanning(Bitmap[] info)
@@ -180,6 +180,7 @@ namespace Rovio
             g.DrawRectangle(new Pen(Color.Blue), biggest);
             g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
             g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+
             return Filtered;
         }
 
