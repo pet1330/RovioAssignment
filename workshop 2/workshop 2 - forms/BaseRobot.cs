@@ -125,10 +125,12 @@ namespace Rovio
 
         protected void ExtractFeatrures(Bitmap[] filtered)
         {
-            //UpdateVideo(ExtractRedFeatures(filtered[RED]));
-            //UpdateVideo(
-            ExtractGreenFeatures(filtered[GREEN]);//);
-            
+           // ExtractRedFeatures(filtered[RED]);
+           // ExtractGreenFeatures(filtered[GREEN]);
+           // ExtractYellowFeatures(filtered[YELLOW]);
+           // ExtractWhiteFeatures(filtered[WHITE]);
+            ExtractRedFeatures(filtered[RED]);
+            UpdateVideo(ExtractGreenFeatures(filtered[GREEN]));
         }
 
         protected void ActionPlanning(Bitmap[] info)
@@ -164,12 +166,12 @@ namespace Rovio
 
             //Needs to be placed in a stats object and passed to the map to be processed
             //===============================================================
-            // this.map.blockWidth = biggest.Width;
-            // this.map.blockHeightAtOnemeter = 25.0f;
-            // this.map.blocksCurrentHeight = biggest.Height;
-            // this.map.distanceToWidthSightPathRatio = 0.92f;
-            // this.map.imageWidth = Filtered.Width;
-            // this.map.blockXLocation = biggest.X;
+             this.map.blockWidth = biggest.Width;
+             this.map.blockHeightAtOnemeter = 25.0f;
+             this.map.blocksCurrentHeight = biggest.Height;
+             this.map.distanceToWidthSightPathRatio = 0.92f;
+             this.map.imageWidth = Filtered.Width;
+             this.map.blockXLocation = biggest.X;
             //==============================================================
             //map.Draw();
             //User Feedback
@@ -226,25 +228,116 @@ namespace Rovio
 
         private Bitmap ExtractBlueFeatures(Bitmap Filtered)
         {
-            // locate objects using blob counter
-            BlobCounter blobCounter = new BlobCounter();
-            blobCounter.ProcessImage(Filtered);
-            Blob[] blobs = blobCounter.GetObjectsInformation();
-            // create Graphics object to draw on the image and a pen
+            BlobCounter bc = new BlobCounter();
             Graphics g = Graphics.FromImage(Filtered);
             Pen bluePen = new Pen(Color.Blue, 2);
-            // check each object and draw circle around objects, which
-            // are recognized as circles
+            bc.MinWidth = 15;
+            bc.MinHeight = 15;
+            bc.MaxHeight = 40;
+            bc.FilterBlobs = true;
+            bc.ObjectsOrder = ObjectsOrder.Size;
+            bc.ProcessImage(Filtered);
+            Blob[] blobs = bc.GetObjectsInformation();
+
+            List<IntPoint> edgePoints = new List<IntPoint>();
             for (int i = 0, n = blobs.Length; i < n; i++)
             {
-                List<IntPoint> edgePoints = blobCounter.GetBlobsEdgePoints(blobs[i]);
+                edgePoints = bc.GetBlobsEdgePoints(blobs[i]);
+            }
+            if (edgePoints.Count != 0)
+            {
                 List<IntPoint> corners = PointsCloud.FindQuadrilateralCorners(edgePoints);
-
                 g.DrawPolygon(bluePen, ToPointsArray(corners));
             }
+            return Filtered;
+        }
 
-            bluePen.Dispose();
-            g.Dispose();
+        private Bitmap ExtractYellowFeatures(Bitmap Filtered)
+        {
+            BlobCounter bc = new BlobCounter();
+            Stats toReturn = new Stats(YELLOW);
+            bc.MinWidth = 5;
+            bc.MinHeight = 25;
+            bc.MaxHeight = 40;
+            bc.FilterBlobs = true;
+            bc.ObjectsOrder = ObjectsOrder.Size;
+            bc.ProcessImage(Filtered);
+            Rectangle[] rects = bc.GetObjectsRectangles();
+            Rectangle biggest = new Rectangle(0, 0, 0, 0);
+            Graphics g = Graphics.FromImage(Filtered);
+
+            if ((rects.Length > 0) && (rects[0].Height > 0))
+            {
+                biggest = rects[0];
+            }
+
+            toReturn.RedBlockDetected = true;
+            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+            toReturn.RedBlockHeight = biggest.Height;
+            toReturn.RedBlockWidth = biggest.Width;
+            toReturn.RedBlockDistance = (25.0f / biggest.Height);
+
+            //Needs to be placed in a stats object and passed to the map to be processed
+            //===============================================================
+            // this.map.blockWidth = biggest.Width;
+            // this.map.blockHeightAtOnemeter = 25.0f;
+            // this.map.blocksCurrentHeight = biggest.Height;
+            // this.map.distanceToWidthSightPathRatio = 0.92f;
+            // this.map.imageWidth = Filtered.Width;
+            // this.map.blockXLocation = biggest.X;
+            //==============================================================
+            //map.Draw();
+            //User Feedback
+            string objectString = Math.Round((43.0f / biggest.Height), 2).ToString();
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
+            g.DrawRectangle(new Pen(Color.Blue), biggest);
+            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+            UpdateVideo(Filtered);
+            return Filtered;
+        }
+
+        private Bitmap ExtractWhiteFeatures(Bitmap Filtered)
+        {
+            BlobCounter bc = new BlobCounter();
+            Stats toReturn = new Stats(WHITE);
+            bc.MinWidth = 5;
+            bc.MinHeight = 25;
+            bc.MaxHeight = 40;
+            bc.FilterBlobs = true;
+            bc.ObjectsOrder = ObjectsOrder.Size;
+            bc.ProcessImage(Filtered);
+            Rectangle[] rects = bc.GetObjectsRectangles();
+            Rectangle biggest = new Rectangle(0, 0, 0, 0);
+            Graphics g = Graphics.FromImage(Filtered);
+
+            if ((rects.Length > 0) && (rects[0].Height > 0))
+            {
+                biggest = rects[0];
+            }
+
+            toReturn.RedBlockDetected = true;
+            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+            toReturn.RedBlockHeight = biggest.Height;
+            toReturn.RedBlockWidth = biggest.Width;
+            toReturn.RedBlockDistance = (25.0f / biggest.Height);
+
+            //Needs to be placed in a stats object and passed to the map to be processed
+            //===============================================================
+            // this.map.blockWidth = biggest.Width;
+            // this.map.blockHeightAtOnemeter = 25.0f;
+            // this.map.blocksCurrentHeight = biggest.Height;
+            // this.map.distanceToWidthSightPathRatio = 0.92f;
+            // this.map.imageWidth = Filtered.Width;
+            // this.map.blockXLocation = biggest.X;
+            //==============================================================
+            //map.Draw();
+            //User Feedback
+            string objectString = Math.Round((43.0f / biggest.Height), 2).ToString();
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
+            g.DrawRectangle(new Pen(Color.Blue), biggest);
+            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
             UpdateVideo(Filtered);
             return Filtered;
         }
@@ -260,5 +353,7 @@ namespace Rovio
 
             return array;
         }
+
+
     }
 }

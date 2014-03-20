@@ -37,6 +37,12 @@ namespace Rovio
                     //------------------------------------------------------------
                     // RGBImage = DetectCorners(FilteredImage[RED]);
                     ExtractFeatrures(FilteredImage);
+
+                    //map.probabilisticMap(150,150,true);
+                    map.Draw();
+
+
+
                     //------------------------------------------------------------
                     // Output to Screen
                     //------------------------------------------------------------   

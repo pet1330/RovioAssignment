@@ -35,7 +35,7 @@ namespace Rovio
 
         public static Point currentLocation;
         public int orientation;
-        double threshold = 0.75;
+        double threshold = 1;
 
         public Mapping()
         {
@@ -53,7 +53,8 @@ namespace Rovio
                     set(i, j, 0.5);
                 }
             }
-            currentLocation = new Point(100, 100);
+            //SET THE CURRENT LOCATION %CL
+            currentLocation = new Point(100, 200);
             Draw();
         }
 
@@ -65,9 +66,10 @@ namespace Rovio
             SolidBrush brush = new SolidBrush(Color.White);
             g.FillRectangle(brush, 0, 0, 260, 300);
             annotate(map);
-            //drawGrid(map);
+            drawGrid(map);
             drawRedBlock(map);
-           //addRovioIcon(map);
+            //drawGreenBlock(map);  //DOES NOT WORK YET
+            addRovioIcon(map);
             drawMapToScreen(map);
         }
 
@@ -131,9 +133,14 @@ namespace Rovio
             double  mapProb = get(x,y);
             bool world = (mapProb < threshold);
 
-            double newProb = (statesProbability(world, sensor) * mapProb) /((statesProbability(world, sensor) * mapProb) + (statesProbability(!world, sensor) * (1 - mapProb)));
-            
-            set(x,y,newProb);
+            //Console.WriteLine("" + (statesProbability(world, sensor) + " * " + mapProb +  "\n" + statesProbability(world, sensor) + " * " +  mapProb + "+" + statesProbability(!world, sensor) +  "*" +  (1 - mapProb)));
+
+            double newProb = (statesProbability(world, sensor) * mapProb) /((statesProbability(world, sensor) * mapProb) + (statesProbability(!world, sensor) * ((1 - mapProb))));
+
+           if ((newProb > 0.05) && (newProb < 0.95))
+            {
+                set(x, y, newProb);
+            }
             return newProb;
         }
 
@@ -245,29 +252,50 @@ namespace Rovio
                 row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
             }
 
+            double realDist = Math.Sqrt(Math.Pow(dist, 2) + Math.Pow(a, 2));
+
+            double col = (currentLocation.Y - realDist);
+
+            g.FillRectangle(new SolidBrush(Color.Red), (float)row, (float)col, 7, 4);
+
+        }
+
+        private void drawGreenBlock(Bitmap m)
+        {
+            Graphics g = Graphics.FromImage(m);
+            Pen p = new Pen(Color.Red);
+            double dist = 1.0f;
+
+            if (blocksCurrentHeight != 0)
+            {
+                dist = ((130.0f / blocksCurrentHeight) * 100f);
+            }
+
+            double a = ((dist * 0.92));
+            a = ((imageWidth) / a);
+            a = (((blockWidth / 2.0) + (blockXLocation)) / a);
+
+            double row = 0;
+
+            if (((blockWidth / 2.0f) + (blockXLocation)) <= (imageWidth / 2))
+            {
+                row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
+            }
+            else
+            {
+                row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
+            }
 
             double realDist = Math.Sqrt(Math.Pow(dist, 2) + Math.Pow(a, 2));
 
             double col = (currentLocation.Y - realDist);
 
-
-            g.FillRectangle(new SolidBrush(Color.Red), (float)row, (float)col, 10, 10);
-
-
-
-
-        }
-
-        private void drawGreenBlocks(Bitmap m, Point block)
-        {
-            Graphics g = Graphics.FromImage(m);
-            Pen p = new Pen(Color.Green);
+            g.FillRectangle(new SolidBrush(Color.Green),(float)row, (float)col, 35, 35);
 
         }
 
         private void drawMapToScreen(System.Drawing.Image image)
         {
-
             if (Program.mainForm.InvokeRequired)
             {
                 Program.mainForm.Invoke(new System.Windows.Forms.MethodInvoker(delegate { drawMapToScreen(image); }));
