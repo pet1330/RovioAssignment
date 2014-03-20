@@ -226,7 +226,6 @@ namespace Rovio
 
         private Bitmap ExtractBlueFeatures(Bitmap Filtered)
         {
-
             // locate objects using blob counter
             BlobCounter blobCounter = new BlobCounter();
             blobCounter.ProcessImage(Filtered);
@@ -248,50 +247,6 @@ namespace Rovio
             g.Dispose();
             UpdateVideo(Filtered);
             return Filtered;
-
-            /*
-
-            BlobCounter bc = new BlobCounter();
-            Stats toReturn = new Stats(BLUE);
-            bc.MinWidth = 15;
-            bc.MinHeight = 15;
-            bc.FilterBlobs = true;
-            bc.ObjectsOrder = ObjectsOrder.Size;
-            bc.ProcessImage(Filtered);
-            Rectangle[] rects = bc.GetObjectsRectangles();
-            Rectangle biggest = new Rectangle(0, 0, 0, 0);
-            Graphics g = Graphics.FromImage(Filtered);
-
-            if ((rects.Length > 0) && (rects[0].Height > 0))
-            {
-                biggest = rects[0];
-            }
-
-            toReturn.RedBlockDetected = true;
-            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
-            toReturn.RedBlockHeight = biggest.Height;
-            toReturn.RedBlockWidth = biggest.Width;
-            toReturn.RedBlockDistance = (130.0f / biggest.Height);
-
-            //Needs to be placed in a stats object and passed to the map to be processed
-            //===============================================================
-            // this.map.blockWidth = biggest.Width;
-            // this.map.blockHeightAtOnemeter = 130.0f;
-            // this.map.blocksCurrentHeight = biggest.Height;
-            // this.map.distanceToWidthSightPathRatio = 0.92f;
-            // this.map.imageWidth = Filtered.Width;
-            // this.map.blockXLocation = biggest.X;
-            //==============================================================
-            //map.Draw();
-            //User Feedback
-            string objectString = Math.Round((130.0f / biggest.Height), 2).ToString();
-            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X);
-            g.DrawRectangle(new Pen(Color.Blue), biggest);
-            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
-            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
-            return Filtered;
-
-            */
         }
 
         private System.Drawing.Point[] ToPointsArray(List<IntPoint> points)

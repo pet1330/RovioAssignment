@@ -57,22 +57,19 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AForge, Version=2.2.3.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\AForge.NET Framework-2.2.4\Release\AForge.dll</HintPath>
+    <Reference Include="AForge">
+      <HintPath>..\aforge.net framework-2.2.4\Release\AForge.dll</HintPath>
     </Reference>
-    <Reference Include="AForge.Imaging, Version=2.2.3.0, Culture=neutral, PublicKeyToken=ba8ddea9676ca48b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\AForge.NET Framework-2.2.4\Release\AForge.Imaging.dll</HintPath>
+    <Reference Include="AForge.Imaging">
+      <HintPath>..\aforge.net framework-2.2.4\Release\AForge.Imaging.dll</HintPath>
     </Reference>
     <Reference Include="AForge.Imaging.Formats">
-      <HintPath>..\AForge.NET Framework-2.2.4\Release\AForge.Imaging.Formats.dll</HintPath>
+      <HintPath>..\aforge.net framework-2.2.4\Release\AForge.Imaging.Formats.dll</HintPath>
     </Reference>
     <Reference Include="AForge.Imaging.IPPrototyper">
-      <HintPath>..\AForge.NET Framework-2.2.4\Release\AForge.Imaging.IPPrototyper.dll</HintPath>
+      <HintPath>..\aforge.net framework-2.2.4\Release\AForge.Imaging.IPPrototyper.dll</HintPath>
     </Reference>
-    <Reference Include="AForge.Math, Version=2.2.5.0, Culture=neutral, PublicKeyToken=abba2e25397ee8c9, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="AForge.Math">
       <HintPath>..\aforge.net framework-2.2.4\Release\AForge.Math.dll</HintPath>
     </Reference>
     <Reference Include="System" />
