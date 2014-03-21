@@ -25,8 +25,7 @@ namespace Rovio
 
         private static double[] mapData = new double[(mapWidth * mapHeight)];
         private static Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
-        AStar pathFinding = new AStar();
-
+        
         public double blockWidth;
         public double blockHeightAtOnemeter;
         public double blocksCurrentHeight;
@@ -77,7 +76,7 @@ namespace Rovio
             annotate(map);
             //drawGrid(map);
             drawRedBlock(map);
-            //drawGreenBlock(map);  //DOES NOT WORK YET
+            //drawGreenBlock(map);
             addRovioIcon(map);
             drawMapToScreen(map);
         }
@@ -243,52 +242,54 @@ namespace Rovio
             }
         }
 
-        private void drawRedBlock(Bitmap m)
+        private Point calculateRedBlockLocation(float HightAtOneMeter, double blocksCurrentHeight)
         {
-            Graphics g = Graphics.FromImage(m);
-            Pen p = new Pen(Color.Red);
             double dist = 1.0f;
-
             if (blocksCurrentHeight != 0)
             {
-                dist = ((25.0f / blocksCurrentHeight) * 100f);
+                dist = ((HightAtOneMeter / blocksCurrentHeight) * 100);
             }
 
             double a = ((dist * 0.92));
             a = ((imageWidth) / a);
             a = (((blockWidth / 2.0) + (blockXLocation)) / a);
 
-            double row = 0;
-
             if (((blockWidth / 2.0f) + (blockXLocation)) <= (imageWidth / 2))
             {
-                row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
+                double row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
             }
             else
             {
-                row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
+                double row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
             }
 
             double realDist = Math.Sqrt(Math.Pow(dist, 2) + Math.Pow(a, 2));
 
             double col = (currentLocation.Y - realDist);
             if (double.IsNaN(row) || double.IsNaN(col))
-                return;
+            {
+                return new Point(-1, -1);
+            }
+            else
+            {
+                return new Point((int)row, (int)col);
+            }
+        }
 
-            g.FillRectangle(new SolidBrush(Color.Red), (float)row, (float)col, 7, 4);
+        private void drawRedBlock(Bitmap m)
+        {
+            Graphics g = Graphics.FromImage(m);
+            Pen p = new Pen(Color.Red);
+
+            Point poi = calculateRedBlockLocation();
+            g.FillRectangle(new SolidBrush(Color.Red), (float)poi.X, (float)poi.Y, 7, 4);
 
             for (int i = -3; i < 4; i++)
             {
                 for (int j = -2; j < 2; j++)
                 {
-                    probabilisticMap(Convert.ToInt32((row + i)), Convert.ToInt32((col + j)), true);
+                    probabilisticMap(Convert.ToInt32((poi.X + i)), Convert.ToInt32((poi.Y + j)), true);
                 }
-            }
-
-            pathFinding.FindPath(currentLocation, new Point((int)row, (int)col));
-            foreach (Point loop in pathFinding.path)
-            {
-                set(loop.X, loop.Y, 1);
             }
         }
         
@@ -339,159 +340,5 @@ namespace Rovio
         }
 
         private delegate void mapImageReady(System.Drawing.Image image);
-
-
-        /*
-        public List<PathElement> AStar(Point Pstart, Point Pend)
-        {
-            PathElement start = new PathElement(Pstart.X, Pstart.Y);
-            PathElement end = new PathElement(Pend.X, Pend.Y);
-
-            List<PathElement> openList = new List<PathElement>();
-            List<PathElement> closeList = new List<PathElement>();
-            
-            openList.Add(start);
-
-            while (true)
-            {
-                int tempF = int.MaxValue;
-                //Sort by lowest F cost
-                openList = openList.OrderBy(o => o.F()).ToList();
-
-                foreach (PathElement item in openList)
-                {
-                    if (item.F() < tempF)
-                    {
-                        tempF = item.F();
-                    }
-                }
-               
-                if (tempF == int.MaxValue)
-                    return null;
-                //select first element
-                PathElement selected = openList.First();
-                closeList.Add(selected);
-                openList.Remove(selected);
-
-                //check we've not found the target
-                if (selected.xPos == end.xPos && selected.yPos == end.yPos)
-                {
-                    List<PathElement> finalList = new List<PathElement>();
-                    finalList.Add(end);
-                    while (selected.parent != null)
-                    {
-                        finalList.Add(selected);
-                        selected = selected.parent;
-                    }
-                
-                    finalList.Add(start);
-                    finalList.Reverse();
-                    return finalList;
-                }
-
-
-                for (int ii = -1; ii <= 1; ii++)
-                {
-                    for (int jj = -1; jj <= 1; jj++)
-                    {
-                        //sets which element we're looking at
-                        int currentX = selected.xPos + ii;
-                        int currentY = selected.yPos + jj;
-
-                        //check we're still within the board
-                        if (currentX < 0)
-                        {
-                            continue;
-                        }
-                        if (currentX > mapWidth)
-                        {
-                            continue;
-                        }
-                        if (currentY < 0)
-                        {
-                            continue;
-                        }
-                        if (currentY > mapHeight)
-                        {
-                            continue;
-                        }
-
-                        //ignore walls
-                        if (get(currentY, currentX) > 0.6)
-                        {
-                            continue;
-                        }
-
-                        int xDiff = Math.Abs(currentX - (selected.xPos));
-                        int yDiff = Math.Abs(currentY - (selected.yPos));
-
-                        int direction = 0;
-
-                        if (xDiff == 1 && yDiff == 1)
-                        {
-                            direction = 14;
-                        }
-                        else
-                        {
-                            direction = 10;
-                        }
-
-                        //find Hueristic 
-                        int xh = Math.Abs(currentX - end.xPos);
-                        int yh = Math.Abs(currentY - end.yPos);
-                        int H = 10 * (xh + yh);
-                        int G = selected.G + direction;
-                        bool onOpenList = false;
-
-                        foreach (PathElement it in openList)
-                        {
-                            if (currentX == it.xPos && currentY == it.yPos)
-                            {
-                                onOpenList = true;
-                                //check if parent needs to change
-                                if (selected.G + direction < it.G)
-                                {
-                                    //change parent
-                                    it.parent = selected;
-                                    //change G to new G
-                                    it.G = selected.G + direction;
-                                    break;
-                                }
-                            }
-                        }
-                        if (!onOpenList)
-                        {
-                            bool closed = false;
-                            //check if element is on closed list
-                            foreach (PathElement it in closeList)
-                            {
-                                if (currentX == it.xPos && currentY == it.yPos)
-                                {
-                                    closed = true;
-                                }
-                            }
-                            //if on closed list
-                            if (closed)
-                                //ignore it
-                                continue;
-                            else
-                                //add element to openlist
-                                openList.Add(new PathElement(currentX, currentY, G, H, selected));
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-
-
-        private int AStarHeuristics(Point start, Point end) 
-        {
-            int xh = Math.Abs(start.X - end.X);
-            int yh = Math.Abs(start.Y - end.Y);
-            return (10 * (xh + yh));
-        }
-        */
-
     }
 }
