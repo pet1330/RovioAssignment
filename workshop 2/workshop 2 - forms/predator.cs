@@ -24,13 +24,8 @@ namespace Rovio
                 if (checkConnection())
                 {
                     Bitmap RGBImage = getImage();
-                    FilteredImage = new Bitmap[5];
-
-                    FilteredImage = colourFilter(RGBImage);
-
-                    ExtractFeatrures(FilteredImage);
-
-                   UpdateVideo(RGBImage);
+                    ExtractFeatrures(colourFilter(RGBImage));
+                   // UpdateVideo(RGBImage);
                     if (!run) return;
                 }
                 else

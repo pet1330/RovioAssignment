@@ -110,9 +110,9 @@ namespace Rovio
                         filt.Luminance = new Range(0.25f, 0.8f);
                         break;
                     case BLUE:
-                        filt.Hue = new IntRange(200, 260);
+                        filt.Hue = new IntRange(180, 240);
                         filt.Saturation = new Range(0.1f, 1.0f);
-                        filt.Luminance = new Range(0.0f, 0.7f);
+                        filt.Luminance = new Range(0.1f, 0.7f);
                         break;
                     default /* Red */:
                         filt.Hue = new IntRange(0, 359);
@@ -127,12 +127,11 @@ namespace Rovio
 
         protected void ExtractFeatrures(Bitmap[] filtered)
         {
-            ExtractRedFeatures(filtered[RED]);
-            ExtractGreenFeatures(filtered[GREEN]);
-            ExtractYellowFeatures(filtered[YELLOW]);
-            ExtractWhiteFeatures(filtered[WHITE]);
-            ExtractRedFeatures(filtered[RED]);
-            ExtractGreenFeatures(filtered[GREEN]);
+           // ExtractRedFeatures(filtered[RED]);
+           // ExtractGreenFeatures(filtered[GREEN]);
+           //ExtractYellowFeatures(filtered[YELLOW]);
+           // ExtractWhiteFeatures(filtered[WHITE]);
+            UpdateVideo(ExtractBlueFeatures(filtered[BLUE]));
         }
 
         private delegate void videoImageReady(System.Drawing.Image image);
@@ -211,25 +210,73 @@ namespace Rovio
         {
             BlobCounter bc = new BlobCounter();
             Graphics g = Graphics.FromImage(Filtered);
-            Pen bluePen = new Pen(Color.Blue, 2);
-            bc.MinWidth = 15;
-            bc.MinHeight = 15;
+            Pen bluePen = new Pen(Color.Red, 1);
+            bc.MinWidth = 150;
             bc.MaxHeight = 40;
             bc.FilterBlobs = true;
             bc.ObjectsOrder = ObjectsOrder.Size;
             bc.ProcessImage(Filtered);
-            Blob[] blobs = bc.GetObjectsInformation();
+            List<IntPoint> topEdge;
+            List<IntPoint> bottomEdge;
 
-            List<IntPoint> edgePoints = new List<IntPoint>();
-            for (int i = 0, n = blobs.Length; i < n; i++)
+            foreach (Blob blob in bc.GetObjectsInformation())
             {
-                edgePoints = bc.GetBlobsEdgePoints(blobs[i]);
+                bc.GetBlobsTopAndBottomEdges(blob, out topEdge, out bottomEdge);
+                g.DrawLine(bluePen, (float)topEdge[0].X, (float)topEdge[0].Y, (float)topEdge[topEdge.Count - 1].X, (float)topEdge[topEdge.Count - 1].Y);
+                g.DrawLine(bluePen, (float)bottomEdge[0].X, (float)bottomEdge[0].Y, (float)bottomEdge[bottomEdge.Count - 1].X, (float)bottomEdge[bottomEdge.Count - 1].Y);
+
+
+                List<int> topint = new List<int>(topEdge.Count);
+                List<int> bottomint = new List<int>(bottomEdge.Count);
+                for (int i = 0; i < topEdge.Count; i++)
+                {
+                    topint.Add(topEdge[i].Y);
+                }
+
+                for (int i = 0; i < bottomEdge.Count; i++)
+                {
+                    bottomint.Add(bottomEdge[i].Y);
+                }
+
+                Console.WriteLine("Top = {0}     Bottom = {1}", Convert.ToInt32(topint.Average()), Convert.ToInt32(bottomint.Average()));
+
+
+
+                int c = 0;
+                if (topEdge.Count <= bottomEdge.Count)
+                {
+                    c = topEdge.Count;
+                }
+                else
+                {
+                    c = bottomEdge.Count;
+                }
+                int[] average = new int[c];
+                for (int i = 0; i < c; i++)
+                {
+                    average[i] = (bottomEdge[i].Y) - (topEdge[i].Y);
+                }
+                int total = 0;
+                foreach (int n in average)
+                {
+                    total += n;
+                }
+                Console.WriteLine(total / c);
             }
-            if (edgePoints.Count != 0)
-            {
-                List<IntPoint> corners = PointsCloud.FindQuadrilateralCorners(edgePoints);
-                g.DrawPolygon(bluePen, ToPointsArray(corners));
-            }
+
+            
+
+
+           // List<IntPoint> edgePoints = new List<IntPoint>();
+           // for (int i = 0, n = blobs.Length; i < n; i++)
+           // {
+            //    edgePoints = bc.GetBlobsEdgePoints(blobs[i]);
+            //}
+           // if (edgePoints.Count != 0)
+           // {
+            //    List<IntPoint> corners = PointsCloud.FindQuadrilateralCorners(edgePoints);
+            //    g.DrawPolygon(bluePen, ToPointsArray(corners));
+           // }
             return Filtered;
         }
 

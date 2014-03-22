@@ -19,7 +19,7 @@ namespace Rovio
         private const int W = 270;
         private const int NW = 315;
         private const int N = 0;
-        private const int NE = 45;
+        private const int NE = 0;
 
         private static int mapWidth = 260;
         private static int mapHeight = 300;
@@ -82,6 +82,17 @@ namespace Rovio
             
             double realDist = Math.Sqrt(Math.Pow(v, 2) + Math.Pow(h, 2));
 
+            //TEST! DEBUG! TAKE OUT / TEST
+            System.Drawing.Point p = new System.Drawing.Point(h, v);
+            System.Drawing.Drawing2D.Matrix m = new System.Drawing.Drawing2D.Matrix();
+            m.RotateAt(orientation, new System.Drawing.Point(h,v));
+            // Point to rotate around
+            m.Translate(currentLocation.X, currentLocation.Y);
+            System.Drawing.Point[] aPoints = { p };
+            m.TransformPoints(aPoints);
+            h = aPoints[0].X;
+            v = aPoints[0].Y;
+            
             Point newLocation = RotateLocation(new Point(h,v));
 
             probabilisticMap((newLocation.X + currentLocation.X), (newLocation.Y + currentLocation.Y), true);
