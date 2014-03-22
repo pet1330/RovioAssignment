@@ -40,7 +40,7 @@ namespace Rovio
                     //------------------------------------------------------------
 
                     //map.probabilisticMap(150, 150, false);
-                    map.Draw();
+                    //map.Draw();
 
 
                     // Output to Screen

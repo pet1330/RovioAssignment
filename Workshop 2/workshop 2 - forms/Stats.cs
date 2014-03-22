@@ -6,11 +6,8 @@ using System.Drawing;
 
 namespace Rovio
 {
-    class Stats
+    public class Stats
     {
-        //RED BLOCK
-        //---------------------------------------------------------------
-        int colour;
 
         #region Red Stats
         public bool RedBlockDetected;
@@ -35,7 +32,7 @@ namespace Rovio
         public Point[] BlueLineRightPoint;
         public int[] BlueLineThickness;
         #endregion
-        
+
         #region Yellow Wall Stats
         public bool YellowWallDetected;
         public double[] YellowWallClosestPointDistance;
@@ -57,12 +54,5 @@ namespace Rovio
         public int[] WhiteWallHeight;
         public int[] WhiteWallWidth;
         #endregion
-
-
-
-        public Stats(int colourFilter)
-        {
-            colour = colourFilter;
-        }
     }
 }

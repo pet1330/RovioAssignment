@@ -39,7 +39,7 @@ namespace Rovio
                     ExtractFeatrures(FilteredImage);
 
                     //map.probabilisticMap(150,150,true);
-                    map.Draw();
+                    //map.Draw();
 
 
 

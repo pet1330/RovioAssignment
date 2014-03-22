@@ -5,6 +5,8 @@ using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 using AForge.Imaging.Filters;
+using System.Collections.Concurrent;
+using System.Threading;
 
 namespace Rovio
 {
@@ -26,17 +28,54 @@ namespace Rovio
         private static double[] mapData = new double[(mapWidth * mapHeight)];
         private static Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
         
-        public double blockWidth;
-        public double blockHeightAtOnemeter;
-        public double blocksCurrentHeight;
-        public double distanceToWidthSightPathRatio;
-        public double imageWidth;
-        public double blockXLocation;
+        public double imageWidth = 352;
 
         public static Point currentLocation;
         public int orientation;
         public static double threshold = 1;
 
+        public static BlockingCollection<Rovio.Stats> queue = new BlockingCollection<Rovio.Stats>(10);
+
+        public void runMap()
+        {
+            while (true)
+            {
+                foreach (Stats stats in queue.GetConsumingEnumerable())
+                {
+                    if (stats.RedBlockDetected)
+                    {
+                        UpdateRedBlock(stats);
+                    }
+
+                    if (stats.GreenBlockDetected)
+                    {
+                        UpdateGreenBlock(stats);
+                    }
+
+                    if (stats.YellowWallDetected)
+                    {
+                        UpdateYellowWall(stats);
+                    }
+
+                    if (stats.WhiteWallDetected)
+                    {
+                        UpdateWhiteWall(stats);
+                    }
+
+                    if (stats.BlueLineDetected)
+                    {
+                        UpdateBlueLine(stats);
+                    }
+                }
+                Draw();
+            }
+        }
+
+        private void UpdateRedBlock(Stats stats)
+        {
+            double realDist = Math.Sqrt(Math.Pow(dist, 2) + Math.Pow(a, 2));
+        }
+        
         public Mapping()
         {
             for (int i = 0; i < mapHeight; i++)
@@ -54,11 +93,10 @@ namespace Rovio
                 }
             }
 
-            for (int i = 0; i < mapWidth; i++)
-            {
-                set(i, 120, 1);
-            }
-
+          //  for (int i = 0; i < mapWidth; i++)
+          //  {
+          //      set(i, 120, 1);
+         //   }
 
             //SET THE CURRENT LOCATION %CL
             currentLocation = new Point(100, 200);
@@ -72,18 +110,10 @@ namespace Rovio
             Graphics g = Graphics.FromImage(map);
             SolidBrush brush = new SolidBrush(Color.White);
             g.FillRectangle(brush, 0, 0, 260, 300);
-           
             annotate(map);
-            //drawGrid(map);
-            drawRedBlock(map);
-            //drawGreenBlock(map);
+            drawGrid(map);
             addRovioIcon(map);
             drawMapToScreen(map);
-        }
-
-        public void statsInfoUpdate()
-        {
-
         }
 
         public static double get(Point toGet)
@@ -187,14 +217,6 @@ namespace Rovio
             return Math.Cos((angle * (Math.PI / 180)));
         }
 
-        private Point RotateLocation(Point old)
-        {
-            double rotatedX = (old.X * cos(orientation)) + (old.Y * sin(orientation));
-            double rotatedY = (-old.X * sin(orientation)) + old.Y * cos(orientation);
-            Point toReturn = new Point(Convert.ToInt32(rotatedX), Convert.ToInt32(rotatedY));
-            return toReturn;
-        }
-
         private void addRovioIcon(Bitmap m)
         {
             Graphics g = Graphics.FromImage(m);
@@ -242,30 +264,54 @@ namespace Rovio
             }
         }
 
-        private Point calculateRedBlockLocation(float HightAtOneMeter, double blocksCurrentHeight)
+        private Point RotateLocation(Point old)
+        {
+            double rotatedX = (old.X * cos(orientation)) + (old.Y * sin(orientation));
+            double rotatedY = (-old.X * sin(orientation)) + old.Y * cos(orientation);
+            Point toReturn = new Point(Convert.ToInt32(rotatedX), Convert.ToInt32(rotatedY));
+            return toReturn;
+        }
+
+        private double PXtoCM(double heightAtOneMetre, double blocksHeight, double blockWidth, double blockXLocation)
+        {
+            double dist = ((heightAtOneMetre / blocksHeight) * 100);
+            double row = (((blockWidth / 2.0) + (blockXLocation)) / ((imageWidth) / ((dist * 0.92))));
+
+            if (((blockWidth / 2.0) + (blockXLocation)) <= (imageWidth / 2))
+            {
+                row = (currentLocation.X - (((dist * 0.92) / 2.0) - row));
+            }
+            else
+            {
+                row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - row)));
+            }
+            return row;
+        }
+
+        private Point calculateGreenBlockLocation(float blockHightAtOneMeter, double blocksCurrentHeight, double blockWidth, double blockXLocation)
         {
             double dist = 1.0f;
             if (blocksCurrentHeight != 0)
             {
-                dist = ((HightAtOneMeter / blocksCurrentHeight) * 100);
+                dist = ((blockHightAtOneMeter / blocksCurrentHeight) * 100);
             }
 
             double a = ((dist * 0.92));
             a = ((imageWidth) / a);
             a = (((blockWidth / 2.0) + (blockXLocation)) / a);
-
-            if (((blockWidth / 2.0f) + (blockXLocation)) <= (imageWidth / 2))
+            double row = 0;
+            if (((blockWidth / 2.0) + (blockXLocation)) <= (imageWidth / 2))
             {
-                double row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
+                row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
             }
             else
             {
-                double row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
+                row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
             }
 
             double realDist = Math.Sqrt(Math.Pow(dist, 2) + Math.Pow(a, 2));
 
-            double col = (currentLocation.Y - realDist);
+            double col = (currentLocation.Y - dist);
             if (double.IsNaN(row) || double.IsNaN(col))
             {
                 return new Point(-1, -1);
@@ -275,7 +321,7 @@ namespace Rovio
                 return new Point((int)row, (int)col);
             }
         }
-
+        /*
         private void drawRedBlock(Bitmap m)
         {
             Graphics g = Graphics.FromImage(m);
@@ -326,7 +372,7 @@ namespace Rovio
             g.FillRectangle(new SolidBrush(Color.Green),(float)row, (float)col, 35, 35);
 
         }
-
+        */
         private void drawMapToScreen(System.Drawing.Image image)
         {
             if (Program.mainForm.InvokeRequired)

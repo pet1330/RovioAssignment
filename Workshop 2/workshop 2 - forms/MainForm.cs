@@ -20,6 +20,8 @@ namespace Rovio
         private BaseRobot ron;
         private Thread robot_thread;
         private String[] login = { "http://10.82.0.33/", "user", "password" };
+        private Thread map_thread;
+        private Mapping map;
 
         public MainForm()
         {
@@ -29,9 +31,13 @@ namespace Rovio
         private void MainForm_Load(object sender, EventArgs e)
         {
             ron = new User(login[0], login[1], login[2]);
+            map = new Mapping();
             robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
+            map_thread = new System.Threading.Thread(new System.Threading.ThreadStart(map.runMap));
             robot_thread.IsBackground = true;
+            map_thread.IsBackground = true;
             robot_thread.Start();
+            map_thread.Start();
         }
 
         private void Predator_Button_Click(object sender, EventArgs e)

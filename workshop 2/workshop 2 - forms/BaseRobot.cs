@@ -24,7 +24,7 @@ namespace Rovio
         public const int YELLOW = 3;
         public const int BLUE = 4;
 
-        public Mapping map;
+        //public Mapping map;
         protected System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 8);
         protected float x = 10.0F;
         protected float y = 10.0F;
@@ -37,7 +37,7 @@ namespace Rovio
             : base(address, user, password)
         {
             run = true;
-            map = new Mapping();
+            //map = new Mapping();
         }
 
         public abstract void runRovio();
@@ -166,15 +166,16 @@ namespace Rovio
 
             //Needs to be placed in a stats object and passed to the map to be processed
             //===============================================================
-             this.map.blockWidth = biggest.Width;
-             this.map.blockHeightAtOnemeter = 25.0f;
-             this.map.blocksCurrentHeight = biggest.Height;
-             this.map.distanceToWidthSightPathRatio = 0.92f;
-             this.map.imageWidth = Filtered.Width;
-             this.map.blockXLocation = biggest.X;
+            // this.map.blockWidth = biggest.Width;
+            // this.map.blockHeightAtOnemeter = 25.0f;
+            // this.map.blocksCurrentHeight = biggest.Height;
+            // this.map.distanceToWidthSightPathRatio = 0.92f;
+            // this.map.imageWidth = Filtered.Width;
+            // this.map.blockXLocation = biggest.X;
             //==============================================================
             //map.Draw();
             //User Feedback
+
             string objectString = Math.Round((25.0f / biggest.Height), 2).ToString();
             string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
             g.DrawRectangle(new Pen(Color.Blue), biggest);
