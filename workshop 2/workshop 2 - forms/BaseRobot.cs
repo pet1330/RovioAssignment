@@ -23,8 +23,8 @@ namespace Rovio
         public const int WHITE = 2;
         public const int YELLOW = 3;
         public const int BLUE = 4;
+        public readonly object commandLock = new object();
 
-        //public Mapping map;
         protected System.Drawing.Font drawFont = new System.Drawing.Font("Arial", 8);
         protected float x = 10.0F;
         protected float y = 10.0F;
@@ -74,7 +74,10 @@ namespace Rovio
 
         protected Bitmap getImage()
         {
-            return this.Camera.Image;
+            lock (commandLock)
+            {
+                return this.Camera.Image;
+            }
         }
 
         protected Bitmap[] colourFilter(Bitmap image)
@@ -111,8 +114,7 @@ namespace Rovio
                         filt.Saturation = new Range(0.1f, 1.0f);
                         filt.Luminance = new Range(0.0f, 0.7f);
                         break;
-                    //Default Red
-                    default:
+                    default /* Red */:
                         filt.Hue = new IntRange(0, 359);
                         filt.Saturation = new Range(0.0f, 1.0f);
                         filt.Luminance = new Range(0.0f, 1.0f);
@@ -125,17 +127,12 @@ namespace Rovio
 
         protected void ExtractFeatrures(Bitmap[] filtered)
         {
-           // ExtractRedFeatures(filtered[RED]);
-           // ExtractGreenFeatures(filtered[GREEN]);
-           // ExtractYellowFeatures(filtered[YELLOW]);
-           // ExtractWhiteFeatures(filtered[WHITE]);
-            UpdateVideo(ExtractRedFeatures(filtered[RED]));
+            ExtractRedFeatures(filtered[RED]);
             ExtractGreenFeatures(filtered[GREEN]);
-        }
-
-        protected void ActionPlanning(Bitmap[] info)
-        {
-
+            ExtractYellowFeatures(filtered[YELLOW]);
+            ExtractWhiteFeatures(filtered[WHITE]);
+            ExtractRedFeatures(filtered[RED]);
+            ExtractGreenFeatures(filtered[GREEN]);
         }
 
         private delegate void videoImageReady(System.Drawing.Image image);
@@ -143,7 +140,7 @@ namespace Rovio
         private Bitmap ExtractRedFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
-            Stats toReturn = new Stats(RED);
+            Stats redStats = new Stats();
             bc.MinWidth = 5;
             bc.MinHeight = 5;
             bc.FilterBlobs = true;
@@ -158,28 +155,17 @@ namespace Rovio
                 biggest = rects[0];
             }
 
-            toReturn.RedBlockDetected = true;
-            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
-            toReturn.RedBlockHeight = biggest.Height;
-            toReturn.RedBlockWidth = biggest.Width;
-            toReturn.RedBlockDistance = (25.0f / biggest.Height);
-
-            //Needs to be placed in a stats object and passed to the map to be processed
-            //===============================================================
-            // this.map.blockWidth = biggest.Width;
-            // this.map.blockHeightAtOnemeter = 25.0f;
-            // this.map.blocksCurrentHeight = biggest.Height;
-            // this.map.distanceToWidthSightPathRatio = 0.92f;
-            // this.map.imageWidth = Filtered.Width;
-            // this.map.blockXLocation = biggest.X;
-            //==============================================================
-            //map.Draw();
-            //User Feedback
+            redStats.RedBlockDetected = true;
+            redStats.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+            redStats.RedBlockHeight = biggest.Height;
+            redStats.RedBlockWidth = biggest.Width;
+            redStats.RedBlockDistance = (25.0f / biggest.Height);
+            Mapping.queue.Add(redStats);
 
             string objectString = Math.Round((25.0f / biggest.Height), 2).ToString();
-            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (redStats.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
             g.DrawRectangle(new Pen(Color.Blue), biggest);
-            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(objectString, drawFont, Brushes.White, redStats.RedBlockCenterLocation.X, redStats.RedBlockCenterLocation.Y, drawFormat);
             g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
 
             return Filtered;
@@ -188,7 +174,7 @@ namespace Rovio
         private Bitmap ExtractGreenFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
-            Stats toReturn = new Stats(GREEN);
+            Stats greenStats = new Stats();
             bc.MinWidth = 15;
             bc.MinHeight = 15;
             bc.FilterBlobs = true;
@@ -203,30 +189,21 @@ namespace Rovio
                 biggest = rects[0];
             }
 
-            toReturn.RedBlockDetected = true;
-            toReturn.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
-            toReturn.RedBlockHeight = biggest.Height;
-            toReturn.RedBlockWidth = biggest.Width;
-            toReturn.RedBlockDistance = (130.0f / biggest.Height);
+            greenStats.GreenBlockDetected = true;
+            greenStats.GreenBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+            greenStats.GreenBlockHeight = biggest.Height;
+            greenStats.GreenBlockWidth = biggest.Width;
+            greenStats.GreenBlockDistance = (130.0f / biggest.Height);
+            Mapping.queue.Add(greenStats);
 
-
-            //Needs to be placed in a stats object and passed to the map to be processed
-            //===============================================================
-            // this.map.blockWidth = biggest.Width;
-            // this.map.blockHeightAtOnemeter = 130.0f;
-            // this.map.blocksCurrentHeight = biggest.Height;
-            // this.map.distanceToWidthSightPathRatio = 0.92f;
-            // this.map.imageWidth = Filtered.Width;
-            // this.map.blockXLocation = biggest.X;
-            //==============================================================
-            //map.Draw();
-            //User Feedback
-
+#if DEBUG
+            // User Feedback for debug
             string objectString = Math.Round((130.0f / biggest.Height), 2).ToString();
-            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (toReturn.RedBlockCenterLocation.X);
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (greenStats.RedBlockCenterLocation.X);
             g.DrawRectangle(new Pen(Color.Blue), biggest);
-            g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(objectString, drawFont, Brushes.White, greenStats.RedBlockCenterLocation.X, greenStats.RedBlockCenterLocation.Y, drawFormat);
             g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+#endif
             return Filtered;
         }
 
@@ -259,7 +236,7 @@ namespace Rovio
         private Bitmap ExtractYellowFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
-            Stats toReturn = new Stats(YELLOW);
+            Stats toReturn = new Stats();
             bc.MinWidth = 5;
             bc.MinHeight = 25;
             bc.MaxHeight = 40;
@@ -297,14 +274,14 @@ namespace Rovio
             g.DrawRectangle(new Pen(Color.Blue), biggest);
             g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
             g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
-            UpdateVideo(Filtered);
+            //UpdateVideo(Filtered);
             return Filtered;
         }
 
         private Bitmap ExtractWhiteFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
-            Stats toReturn = new Stats(WHITE);
+            Stats toReturn = new Stats();
             bc.MinWidth = 5;
             bc.MinHeight = 25;
             bc.MaxHeight = 40;
@@ -342,7 +319,7 @@ namespace Rovio
             g.DrawRectangle(new Pen(Color.Blue), biggest);
             g.DrawString(objectString, drawFont, Brushes.White, toReturn.RedBlockCenterLocation.X, toReturn.RedBlockCenterLocation.Y, drawFormat);
             g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
-            UpdateVideo(Filtered);
+            //UpdateVideo(Filtered);
             return Filtered;
         }
 
@@ -357,7 +334,5 @@ namespace Rovio
 
             return array;
         }
-
-
     }
 }

@@ -25,28 +25,12 @@ namespace Rovio
                 {
                     Bitmap RGBImage = getImage();
                     FilteredImage = new Bitmap[5];
-                    //this.map.currentLocation = new System.Drawing.Point(120, 190);
-                    //this.map.orientation = 0;
-                    //processImage
-                    //------------------------------------------------------------
+
                     FilteredImage = colourFilter(RGBImage);
 
-                    //Console.WriteLine(map.probabilisticMap(150, 150, true));
-
-                    //FeatureExtract
-                    //------------------------------------------------------------
-                    // RGBImage = DetectCorners(FilteredImage[RED]);
                     ExtractFeatrures(FilteredImage);
 
-                    //map.probabilisticMap(150,150,true);
-                    //map.Draw();
-
-
-
-                    //------------------------------------------------------------
-                    // Output to Screen
-                    //------------------------------------------------------------   
-                   // UpdateVideo(RGBImage);
+                   UpdateVideo(RGBImage);
                     if (!run) return;
                 }
                 else
