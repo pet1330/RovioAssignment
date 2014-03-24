@@ -19,25 +19,9 @@ namespace Rovio
 
         public override void runRovio()
         {
-            while (run)
-            {
-                if (checkConnection())
-                {
-                    Bitmap RGBImage = getImage();
-                    ExtractFeatrures(colourFilter(RGBImage));
-                   // UpdateVideo(RGBImage);
-                    if (!run) return;
-                }
-                else
-                {
-                    //Give the thread some time to connect in case it is the first connection
-                    System.Threading.Thread.Sleep(100);
-                    if (!checkConnection())
-                    {
-                        UpdateVideo(ConnectionLost);
-                    }
-                }
-            }
+            System.Threading.Thread.Sleep(1000);
+            rotateRight90();
+
         }
     }
 }

@@ -27,10 +27,13 @@ namespace Rovio
 
         #region BlueLine Stats
         public bool BlueLineDetected;
-        public double[] BlueLineDistance;
-        public Point[] BlueLineLeftPoint;
-        public Point[] BlueLineRightPoint;
-        public int[] BlueLineThickness;
+        public double BlueLineStraightDistance;
+        public double BlueLineAverageTop;
+        public double BlueLineAverageBottom;
+        public double BlueLineAverageThickness;
+        public double BlueLineLength;
+        public double BlueLineMaxThickness;
+        public double BlueLinePerpendicularDistance;
         #endregion
 
         #region Yellow Wall Stats
@@ -42,6 +45,8 @@ namespace Rovio
         public Point[] YellowWallBottomRightCorner;
         public int[] YellowWallHeight;
         public int[] YellowWallWidth;
+        public bool IsNorth = false;
+        public bool IsSouth = false;
         #endregion
 
         #region White Wall Stats

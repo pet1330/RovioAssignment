@@ -31,10 +31,10 @@ namespace Rovio
         public double imageWidth = 352;
 
         public static Point currentLocation;
-        public int orientation = 90;
+        public static int orientation;
         public static double threshold = 1;
 
-        public static BlockingCollection<Rovio.Stats> queue = new BlockingCollection<Rovio.Stats>(30);
+        public static BlockingCollection<Rovio.Stats> queue = new BlockingCollection<Rovio.Stats>(6);
 
         public void runMap()
         {
@@ -68,6 +68,7 @@ namespace Rovio
                     }
                     Draw();
                 }
+               Draw();
             }
         }
 
@@ -118,14 +119,47 @@ namespace Rovio
         
         private void UpdateYellowWall(Stats stats)
         {
+
+            if (stats.IsNorth)
+            {
+               // orientation = 0;
+            }
+
+            if (stats.IsSouth)
+            {
+               // orientation = 180;
+            }
         }
         
         private void UpdateWhiteWall(Stats stats)
         {
         }
-        
-        private void UpdateBlueLine(Stats stats) 
+
+        private void UpdateBlueLine(Stats stats)
         {
+            if (stats.BlueLinePerpendicularDistance == 0)
+                return;
+
+            if (orientation == N)
+            {
+                currentLocation.Y = Convert.ToInt32(stats.BlueLinePerpendicularDistance* 100);
+            }
+            else if (orientation == S)
+            {
+                currentLocation.Y = mapHeight - Convert.ToInt32(stats.BlueLinePerpendicularDistance * 100);
+            }
+
+            else if (orientation == E)
+            {
+                currentLocation.X = mapWidth - Convert.ToInt32(stats.BlueLinePerpendicularDistance * 100);
+            }
+            else if (orientation == W)
+            {
+                currentLocation.X = Convert.ToInt32(stats.BlueLinePerpendicularDistance * 100);
+            }
+
+
+
         }
 
         public Mapping()
@@ -160,12 +194,23 @@ namespace Rovio
             //Create Blank map
             Bitmap map = new Bitmap(260, 300);
             Graphics g = Graphics.FromImage(map);
-            SolidBrush brush = new SolidBrush(Color.White);
-            g.FillRectangle(brush, 0, 0, 260, 300);
+            //SolidBrush brush = new SolidBrush(Color.White);
+            //g.FillRectangle(brush, 0, 0, 260, 300);
             annotate(map);
-            drawGrid(map);
+            //drawGrid(map);
             addRovioIcon(map);
             drawMapToScreen(map);
+            Point[] view = { new Point(currentLocation.X, currentLocation.Y), new Point((currentLocation.X - 69), currentLocation.Y - 150), new Point((currentLocation.X + 69), currentLocation.Y - 150) };
+            g.DrawPolygon(new Pen(Color.Green), view);
+            //drawViewTriangle(map);
+        }
+
+        private void drawViewTriangle(Bitmap m)
+        {
+            //NEED TO ADD ORIENTATION
+            Graphics g = Graphics.FromImage(m);
+          //  Point [] view = {new Point(currentLocation.X,currentLocation.Y), new Point((currentLocation.X-69),currentLocation.Y - 150), new Point((currentLocation.X+69),currentLocation.Y - 150)};
+          //  g.FillPolygon(new SolidBrush(Color.FromArgb(100,Color.Green)), view);
         }
 
         public static double get(Point toGet)

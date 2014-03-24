@@ -17,11 +17,13 @@ namespace Rovio
 {
     public partial class MainForm : Form
     {
-        private BaseRobot ron;
-        private Thread robot_thread;
         private String[] login = { "http://10.82.0.33/", "user", "password" };
-        private Thread map_thread;
+        private BaseRobot ron;
         private Mapping map;
+        private Vision looker;
+        private Thread robot_thread;
+        private Thread map_thread;
+        private Thread vision_thread;
 
         public MainForm()
         {
@@ -32,12 +34,19 @@ namespace Rovio
         {
             ron = new User(login[0], login[1], login[2]);
             map = new Mapping();
+            looker = new Vision();
+
             robot_thread = new System.Threading.Thread(new System.Threading.ThreadStart(ron.runRovio));
             map_thread = new System.Threading.Thread(new System.Threading.ThreadStart(map.runMap));
+            vision_thread = new System.Threading.Thread(new System.Threading.ThreadStart(looker.runVision));
+
             robot_thread.IsBackground = true;
             map_thread.IsBackground = true;
+            vision_thread.IsBackground = true;
+
             robot_thread.Start();
             map_thread.Start();
+            vision_thread.Start();
         }
 
         private void Predator_Button_Click(object sender, EventArgs e)
@@ -91,5 +100,24 @@ namespace Rovio
             robot_thread.IsBackground = true;
             robot_thread.Start();
         }
+
+        public bool checkConnection()
+        {
+            try
+            {
+                ron.checkConnection();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public Bitmap getImage()
+        {
+            return ron.getImage();
+        }
+
     }
 }
