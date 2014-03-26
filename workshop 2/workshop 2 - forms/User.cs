@@ -17,12 +17,14 @@ namespace Rovio
 
         public override void runRovio()
         {
+            for (int i = 0; i < 10; i++)
+            {
+                driveForward();    
+            }
+            
             while (run)
             {
-                if (checkConnection())
-                {
 
-                }
             }
         }
     }

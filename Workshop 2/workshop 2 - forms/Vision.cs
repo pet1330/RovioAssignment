@@ -95,20 +95,16 @@ namespace Rovio
                 }
                 FilteredImage[i] = filt.Apply(image);
             }
+            UpdateVideo(image);
             return FilteredImage;
         }
 
         protected void ExtractFeatrures(Bitmap[] filtered)
         {
-           // UpdateVideo(ExtractRedFeatures(filtered[RED]));
-            // ExtractGreenFeatures(filtered[GREEN]);
-            //UpdateVideo(ExtractYellowFeatures(filtered[YELLOW]));
+            ExtractRedFeatures(filtered[RED]);
+            ExtractGreenFeatures(filtered[GREEN]);
             ExtractYellowFeatures(filtered[YELLOW]);
-            UpdateVideo(ExtractBlueFeatures(filtered[BLUE]));
-            //Bitmap b = ExtractWhiteFeatures(filtered[WHITE], );
-            //Merge mer = new Merge(a);
-            //UpdateVideo(mer.Apply(b));
-
+            ExtractBlueFeatures(filtered[BLUE]);
         }
 
         private Bitmap ExtractRedFeatures(Bitmap Filtered)
@@ -181,54 +177,52 @@ namespace Rovio
             return Filtered;
         }
 
-        
-     private Bitmap ExtractBlueFeatures(Bitmap Filtered)
-     {
-         BlobCounter bc = new BlobCounter();
-         Stats redStats = new Stats();
-         bc.MinWidth = 100;
-         //bc.MaxHeight = 40;
-         bc.FilterBlobs = true;
-         bc.ObjectsOrder = ObjectsOrder.Size;
-         bc.ProcessImage(Filtered);
-         Rectangle[] rects = bc.GetObjectsRectangles();
-         Rectangle biggest = new Rectangle(0, 0, 0, 0);
-         Graphics g = Graphics.FromImage(Filtered);
 
-         if ((rects.Length > 0) && (rects[0].Height > 0))
-         {
-             biggest = rects[0];
-         }
-
-         redStats.BlueLineDetected = true;
-         //redStats.BlueLineAverageThickness = (11.0f / biggest.Height);
-         //Console.WriteLine(redStats.BlueLineAverageThickness);
-         if(biggest.Height>0)
-         Mapping.queue.Add(redStats);
-
-         string objectString = Math.Round((12.0f / biggest.Height), 2).ToString();
-         string drawString = biggest.Height + " <-- Height  |  Width --> " + biggest.Width + "\n Image Center = " + (redStats.RedBlockCenterLocation.X);
-         g.DrawRectangle(new Pen(Color.Blue), biggest);
-         g.DrawString(objectString, drawFont, Brushes.White, redStats.RedBlockCenterLocation.X, redStats.RedBlockCenterLocation.Y, drawFormat);
-         g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
-
-         Console.WriteLine(biggest.Height);
-
-         if (biggest.Height > 0)
-         {
-             Stats a = new Stats();
-             a.BlueLineDetected = true;
-             a.BlueLinePerpendicularDistance = (11.0/biggest.Height);
-             Mapping.queue.Add(a);
-         }
-
-
-         return Filtered;
-     }
-        
-
-        /*
         private Bitmap ExtractBlueFeatures(Bitmap Filtered)
+        {
+            BlobCounter bc = new BlobCounter();
+            Stats redStats = new Stats();
+            bc.MinWidth = 100;
+            //bc.MaxHeight = 40;
+            bc.FilterBlobs = true;
+            bc.ObjectsOrder = ObjectsOrder.Size;
+            bc.ProcessImage(Filtered);
+            Rectangle[] rects = bc.GetObjectsRectangles();
+            Rectangle biggest = new Rectangle(0, 0, 0, 0);
+            Graphics g = Graphics.FromImage(Filtered);
+
+            if ((rects.Length > 0) && (rects[0].Height > 0))
+            {
+                biggest = rects[0];
+            }
+
+            redStats.BlueLineDetected = true;
+            //redStats.BlueLineAverageThickness = (11.0f / biggest.Height);
+            //Console.WriteLine(redStats.BlueLineAverageThickness);
+            if (biggest.Height > 0)
+                Mapping.queue.Add(redStats);
+
+            string objectString = Math.Round((12.0f / biggest.Height), 2).ToString();
+            string drawString = biggest.Height + " <-- Height  |  Width --> " + biggest.Width + "\n Image Center = " + (redStats.RedBlockCenterLocation.X);
+            g.DrawRectangle(new Pen(Color.Blue), biggest);
+            g.DrawString(objectString, drawFont, Brushes.White, redStats.RedBlockCenterLocation.X, redStats.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+
+            Console.WriteLine(biggest.Height);
+
+            if (biggest.Height > 0)
+            {
+                Stats a = new Stats();
+                a.BlueLineDetected = true;
+                a.BlueLinePerpendicularDistance = (11.0 / biggest.Height);
+                Mapping.queue.Add(a);
+            }
+
+
+            return Filtered;
+        }
+        
+        /* private Bitmap ExtractBlueFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
             Graphics g = Graphics.FromImage(Filtered);
@@ -283,9 +277,8 @@ namespace Rovio
             return Filtered;
         }
         */
-        
-        /*
-        private Bitmap ExtractWhiteFeatures(Bitmap Filtered, Stats blueLine)
+
+        /* private Bitmap ExtractWhiteFeatures(Bitmap Filtered, Stats blueLine)
         {
             BlobCounter bc = new BlobCounter();
             Graphics g = Graphics.FromImage(Filtered);
@@ -338,8 +331,8 @@ namespace Rovio
             }
         }
         */
-        /*
-        private Bitmap ExtractWhiteFeatures(Bitmap Filtered)
+ 
+        /* private Bitmap ExtractWhiteFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
             Stats toReturn = new Stats();
@@ -395,7 +388,7 @@ namespace Rovio
             bc.ObjectsOrder = ObjectsOrder.Size;
             bc.ProcessImage(Filtered);
             List<Blob> blob = new List<Blob>();
-            Blob [] blobs = bc.GetObjectsInformation();
+            Blob[] blobs = bc.GetObjectsInformation();
             blob.AddRange(blobs);
 
             for (int i = 0; i < blobs.Length; i++)
@@ -436,8 +429,7 @@ namespace Rovio
             return Filtered;
         }
 
-        /*
-        private Bitmap ExtractYellowFeatures(Bitmap Filtered)
+        /* private Bitmap ExtractYellowFeatures(Bitmap Filtered)
         {
             BlobCounter bc = new BlobCounter();
             Stats toReturn = new Stats();

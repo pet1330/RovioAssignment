@@ -21,7 +21,11 @@ namespace Rovio
             {
                 if (checkConnection())
                 {
-                 
+
+                }
+                else
+                {
+                    System.Threading.Thread.Sleep(100);
                 }
             }
         }

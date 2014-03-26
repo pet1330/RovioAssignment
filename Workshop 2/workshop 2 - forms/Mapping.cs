@@ -34,7 +34,26 @@ namespace Rovio
         public static int orientation;
         public static double threshold = 1;
 
+        private static Point  redLocation = new Point(-1, -1);
+        private static int redBLockheightinPx = -1;
+
         public static BlockingCollection<Rovio.Stats> queue = new BlockingCollection<Rovio.Stats>(6);
+
+        public static bool redDetected()
+        {
+            return (redLocation!= new Point(-1,-1));
+        }
+
+        public static bool PreyCaught()
+        {
+            return (redBLockheightinPx > 200);
+        }
+
+        public static bool redLostOnLeft()
+        {
+            TODO LOGIC CODE HERE
+            return false;
+        }
 
         public void runMap()
         {

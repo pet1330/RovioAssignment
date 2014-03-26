@@ -16,9 +16,11 @@ namespace Rovio
 {
     abstract class BaseRobot : Robot
     {
-        public readonly object commandLock = new object();
+        public static readonly object commandLock = new object();
 
         protected volatile bool run;
+
+        protected STATE currentState;
 
         protected BaseRobot(string address, string user, string password)
             : base(address, user, password)
@@ -88,19 +90,22 @@ namespace Rovio
             }
         }
 
-
-        /*
-        private System.Drawing.Point[] ToPointsArray(List<IntPoint> points)
+        public void driveForward()
         {
-            System.Drawing.Point[] array = new System.Drawing.Point[points.Count];
-
-            for (int i = 0, n = points.Count; i < n; i++)
+            lock (commandLock)
             {
-                array[i] = new System.Drawing.Point(points[i].X, points[i].Y);
+                System.Threading.Thread.Sleep(100);
+                this.Drive.Forward(1);
             }
-
-            return array;
         }
-        */
+
+        protected enum STATE
+        {
+            CHASE,
+            FIND_PREY,
+            Prey_Caught,
+            Prey_Lost,
+        }
+
     }
 }
