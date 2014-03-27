@@ -27,13 +27,7 @@ namespace Rovio
 
         #region BlueLine Stats
         public bool BlueLineDetected;
-        public double BlueLineStraightDistance;
-        public double BlueLineAverageTop;
-        public double BlueLineAverageBottom;
-        public double BlueLineAverageThickness;
-        public double BlueLineLength;
-        public double BlueLineMaxThickness;
-        public double BlueLinePerpendicularDistance;
+        public double BlueLineDistance;
         #endregion
 
         #region Yellow Wall Stats

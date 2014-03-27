@@ -111,7 +111,7 @@ namespace Rovio
 
         private void CenterPrey()
         {
-            TODO LOGIC CODE HERE
+            Mapping.redBlockStats();
         }
 
         private STATE ChangeLocation()

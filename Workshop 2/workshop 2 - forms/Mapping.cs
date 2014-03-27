@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using AForge.Imaging.Filters;
 using System.Collections.Concurrent;
 using System.Threading;
+using Xna = Microsoft.Xna.Framework;
 
 namespace Rovio
 {
@@ -25,6 +26,8 @@ namespace Rovio
         private static int mapHeight = 300;
         private int cellSize = 10;
 
+        Stats lastStats = new Stats();
+
         private static double[] mapData = new double[(mapWidth * mapHeight)];
         private static Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
         
@@ -33,9 +36,8 @@ namespace Rovio
         public static Point currentLocation;
         public static int orientation;
         public static double threshold = 1;
+        bool redBlockDetected();
 
-        private static Point  redLocation = new Point(-1, -1);
-        private static int redBLockheightinPx = -1;
 
         public static BlockingCollection<Rovio.Stats> queue = new BlockingCollection<Rovio.Stats>(6);
 
@@ -51,7 +53,7 @@ namespace Rovio
 
         public static bool redLostOnLeft()
         {
-            TODO LOGIC CODE HERE
+           
             return false;
         }
 
@@ -87,8 +89,15 @@ namespace Rovio
                     }
                     Draw();
                 }
-               Draw();
             }
+        }
+
+        public Point lerp(Point oldP, Point newP)
+        {
+            Xna.Vector2 OldV = new Xna.Vector2((float)oldP.X, (float)oldP.Y);
+            Xna.Vector2 NewV = new Xna.Vector2((float)newP.X, (float)newP.Y);
+            NewV = Xna.Vector2.Lerp(OldV, NewV, 0.2f);
+            return new Point((int)NewV.X, (int)NewV.Y);
         }
 
         private void UpdateRedBlock(Stats stats)
@@ -115,8 +124,15 @@ namespace Rovio
             
             Point newLocation = RotateLocation(new Point(h,v));
 
-            probabilisticMap((newLocation.X + currentLocation.X), (newLocation.Y + currentLocation.Y), true);
+            redLocation = new Point(newLocation.X, newLocation.Y);
 
+            for (int i = -3; i < 4; i++)
+            {
+                for (int j = -3; j < 4; j++)
+                {
+                    probabilisticMap((newLocation.X + currentLocation.X), (newLocation.Y + currentLocation.Y), true);
+                }
+            }
             //DrawRedBlock((newLocation.X + currentLocation.X), (newLocation.Y + currentLocation.Y));
         }
 
@@ -156,29 +172,67 @@ namespace Rovio
 
         private void UpdateBlueLine(Stats stats)
         {
-            if (stats.BlueLinePerpendicularDistance == 0)
+            if (stats.BlueLineDistance == 0)
                 return;
 
-            if (orientation == N)
+            switch (orientation)
             {
-                currentLocation.Y = Convert.ToInt32(stats.BlueLinePerpendicularDistance* 100);
+                case N:
+                    currentLocation.Y = Convert.ToInt32(stats.BlueLineDistance * 100);
+                    break;
+                case E:
+                    currentLocation.X = mapWidth - Convert.ToInt32(stats.BlueLineDistance * 100);
+                    break;
+                case S:
+                    currentLocation.Y = mapHeight - Convert.ToInt32(stats.BlueLineDistance * 100);
+                    break;
+                case W:
+                    currentLocation.X = Convert.ToInt32(stats.BlueLineDistance * 100);
+                    break;
+                default:
+                    brek;
             }
-            else if (orientation == S)
+        }
+
+        private static bool PointInPolygon(Point p, Point[] poly)
+        {
+            Point p1, p2;
+
+            bool inside = false;
+
+            if (poly.Length < 3)
             {
-                currentLocation.Y = mapHeight - Convert.ToInt32(stats.BlueLinePerpendicularDistance * 100);
+                return inside;
             }
 
-            else if (orientation == E)
+            Point oldPoint = new Point(
+            poly[poly.Length - 1].X, poly[poly.Length - 1].Y);
+
+            for (int i = 0; i < poly.Length; i++)
             {
-                currentLocation.X = mapWidth - Convert.ToInt32(stats.BlueLinePerpendicularDistance * 100);
+                Point newPoint = new Point(poly[i].X, poly[i].Y);
+
+                if (newPoint.X > oldPoint.X)
+                {
+                    p1 = oldPoint;
+                    p2 = newPoint;
+                }
+                else
+                {
+                    p1 = newPoint;
+                    p2 = oldPoint;
+                }
+
+                if ((newPoint.X < p.X) == (p.X <= oldPoint.X)
+                && ((long)p.Y - (long)p1.Y) * (long)(p2.X - p1.X)
+                 < ((long)p2.Y - (long)p1.Y) * (long)(p.X - p1.X))
+                {
+                    inside = !inside;
+                }
+
+                oldPoint = newPoint;
             }
-            else if (orientation == W)
-            {
-                currentLocation.X = Convert.ToInt32(stats.BlueLinePerpendicularDistance * 100);
-            }
-
-
-
+            return inside;
         }
 
         public Mapping()
