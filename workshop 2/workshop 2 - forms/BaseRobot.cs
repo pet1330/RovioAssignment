@@ -20,7 +20,7 @@ namespace Rovio
 
         protected volatile bool run;
 
-        protected STATE currentState;
+        protected STATE currentState = STATE.FIND_PREY;
 
         protected BaseRobot(string address, string user, string password)
             : base(address, user, password)
@@ -62,14 +62,22 @@ namespace Rovio
 
         public void rotateRight45()
         {
-
-
+            lock (commandLock)
+            {
+                Request("rev.cgi?Cmd=nav&action=18&drive=18&speed=1&angle=3");
+                Mapping.orientation += 45;
+            }
+            System.Threading.Thread.Sleep(100);
         }
 
         public void rotateLeft45()
         {
-
-
+            lock (commandLock)
+            {
+                Request("rev.cgi?Cmd=nav&action=18&drive=17&speed=1&angle=3");
+                Mapping.orientation -= 45;
+            }
+            System.Threading.Thread.Sleep(100);
         }
 
         public void rotateRight90()
@@ -79,6 +87,7 @@ namespace Rovio
                 Request("rev.cgi?Cmd=nav&action=18&drive=18&speed=1&angle=7");
                 Mapping.orientation += 90;
             }
+            System.Threading.Thread.Sleep(100);
         }
 
         public void rotateLeft90()
@@ -88,15 +97,16 @@ namespace Rovio
                 Request("rev.cgi?Cmd=nav&action=18&drive=17&speed=1&angle=7");
                 Mapping.orientation -= 90;
             }
+            System.Threading.Thread.Sleep(100);
         }
 
         public void driveForward()
         {
             lock (commandLock)
             {
-                System.Threading.Thread.Sleep(100);
                 this.Drive.Forward(1);
             }
+            System.Threading.Thread.Sleep(100);
         }
 
         protected enum STATE

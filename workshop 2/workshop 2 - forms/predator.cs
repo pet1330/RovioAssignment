@@ -20,7 +20,7 @@ namespace Rovio
         }
         public override void runRovio()
         {
-            while (true)
+            while (run)
             {
                 switch (currentState)
                 {
@@ -43,7 +43,7 @@ namespace Rovio
 
         private STATE FIND_PREY()
         {
-            if (Mapping.redDetected())
+            if (Mapping.redBlockDetected())
             {
                 return STATE.CHASE;
             }
@@ -52,6 +52,7 @@ namespace Rovio
             {
                 rotation += 45;
                 rotateRight45();
+                System.Threading.Thread.Sleep(1000);
                 return STATE.FIND_PREY;
             }
             else
@@ -68,15 +69,16 @@ namespace Rovio
                 return STATE.Prey_Caught;
             }
 
-            CenterPrey();
+            
             while (true)
             {
                 if (Mapping.PreyCaught())
                 {
                     return STATE.Prey_Caught;
                 }
-                else if (Mapping.redDetected())
+                else if (Mapping.redBlockDetected())
                 {
+                    CenterPrey();
                     driveForward();
                 }
                 else
@@ -99,7 +101,7 @@ namespace Rovio
                 rotateRight45();
             }
 
-            if (Mapping.redDetected())
+            if (Mapping.redBlockDetected())
             {
                 return STATE.CHASE;
             }
@@ -111,14 +113,31 @@ namespace Rovio
 
         private void CenterPrey()
         {
-            Mapping.redBlockStats();
+            if (Mapping.lastStats.RedBlockCenterLocation.X > 276)
+            {
+                rotateRight45();
+            }
+
+            if (Mapping.lastStats.RedBlockCenterLocation.X < 176)
+            {
+                rotateLeft45();
+            }
         }
 
         private STATE ChangeLocation()
         {
-            TODO LOGIC CODE HERE
+
+           
+
+            AStar nav = new AStar();
+            nav.FindPath(Mapping.currentLocation,new System.Drawing.Point( Math.Abs(Mapping.currentLocation.Y - 300), Math.Abs(Mapping.currentLocation.Y - 300)));
+
+            foreach (System.Drawing.Point n in nav.path)
+            {
+
+
+            }
             return STATE.FIND_PREY;
         }
-
     }
 }

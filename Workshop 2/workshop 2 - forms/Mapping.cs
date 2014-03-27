@@ -26,35 +26,39 @@ namespace Rovio
         private static int mapHeight = 300;
         private int cellSize = 10;
 
-        Stats lastStats = new Stats();
+        public static Stats lastStats = new Stats();
 
         private static double[] mapData = new double[(mapWidth * mapHeight)];
         private static Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
-        
-        public double imageWidth = 352;
 
+        public static double imageWidth = 352;
+        private static Point redLocation = new Point();
         public static Point currentLocation;
         public static int orientation;
         public static double threshold = 1;
-        bool redBlockDetected();
-
 
         public static BlockingCollection<Rovio.Stats> queue = new BlockingCollection<Rovio.Stats>(6);
 
-        public static bool redDetected()
+        public static bool redBlockDetected()
         {
-            return (redLocation!= new Point(-1,-1));
+            return PointInView(calculateBlockLocation(25.0f, lastStats.RedBlockHeight, lastStats.RedBlockWidth, lastStats.RedBlockCenterLocation.X));
         }
-
+        
         public static bool PreyCaught()
         {
-            return (redBLockheightinPx > 200);
+            return (lastStats.RedBlockHeight > 200);
         }
 
         public static bool redLostOnLeft()
         {
-           
-            return false;
+            if (lastStats.RedBlockCenterLocation.X < 173)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void runMap()
@@ -88,6 +92,17 @@ namespace Rovio
                         UpdateBlueLine(stats);
                     }
                     Draw();
+
+                    for (int i = 0; i < mapWidth; i++)
+                    {
+                        for (int j = 0; j < mapHeight; j++)
+                        {
+                            if (PointInView(new Point(j, i)))
+                            {
+                                probabilisticMap(j, i, false);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -96,7 +111,7 @@ namespace Rovio
         {
             Xna.Vector2 OldV = new Xna.Vector2((float)oldP.X, (float)oldP.Y);
             Xna.Vector2 NewV = new Xna.Vector2((float)newP.X, (float)newP.Y);
-            NewV = Xna.Vector2.Lerp(OldV, NewV, 0.2f);
+            NewV = Xna.Vector2.Lerp(OldV, NewV, 0.1f);
             return new Point((int)NewV.X, (int)NewV.Y);
         }
 
@@ -106,23 +121,23 @@ namespace Rovio
                 return;
 
             int h = PXtoCM((double)25.0, (double)stats.RedBlockHeight, (double)stats.RedBlockWidth, (double)stats.RedBlockCenterLocation.X);
-            
-            int v = (int)(0 - ((25.0 / stats.RedBlockHeight)*100));
-            
+
+            int v = (int)(0 - ((25.0 / stats.RedBlockHeight) * 100));
+
             double realDist = Math.Sqrt(Math.Pow(v, 2) + Math.Pow(h, 2));
 
             //TEST! DEBUG! TAKE OUT / TEST
             System.Drawing.Point p = new System.Drawing.Point(h, v);
             System.Drawing.Drawing2D.Matrix m = new System.Drawing.Drawing2D.Matrix();
-            m.RotateAt(orientation, new System.Drawing.Point(h,v));
+            m.RotateAt(orientation, new System.Drawing.Point(h, v));
             // Point to rotate around
             m.Translate(currentLocation.X, currentLocation.Y);
             System.Drawing.Point[] aPoints = { p };
             m.TransformPoints(aPoints);
             h = aPoints[0].X;
             v = aPoints[0].Y;
-            
-            Point newLocation = RotateLocation(new Point(h,v));
+
+            Point newLocation = RotateLocation(new Point(h, v));
 
             redLocation = new Point(newLocation.X, newLocation.Y);
 
@@ -149,23 +164,29 @@ namespace Rovio
 
             Point newLocation = RotateLocation(new Point(h, v));
 
-            probabilisticMap((newLocation.X + currentLocation.X), (newLocation.Y + currentLocation.Y), true);
+            for (int i = -17; i < 17; i++)
+            {   
+                for (int j = -17; j < 17; j++)
+                {
+                    probabilisticMap((newLocation.X + currentLocation.X + i), (newLocation.Y + currentLocation.Y + j), true);
+                }   
+            }
         }
-        
+
         private void UpdateYellowWall(Stats stats)
         {
 
             if (stats.IsNorth)
             {
-               // orientation = 0;
+                // orientation = 0;
             }
 
             if (stats.IsSouth)
             {
-               // orientation = 180;
+                // orientation = 180;
             }
         }
-        
+
         private void UpdateWhiteWall(Stats stats)
         {
         }
@@ -178,24 +199,28 @@ namespace Rovio
             switch (orientation)
             {
                 case N:
-                    currentLocation.Y = Convert.ToInt32(stats.BlueLineDistance * 100);
+                    currentLocation.Y = lerp(currentLocation, new Point(currentLocation.X, Convert.ToInt32(stats.BlueLineDistance * 100))).Y;
                     break;
                 case E:
-                    currentLocation.X = mapWidth - Convert.ToInt32(stats.BlueLineDistance * 100);
+                    currentLocation.X = mapWidth - lerp(currentLocation, new Point(Convert.ToInt32(stats.BlueLineDistance * 100), currentLocation.Y)).X;
                     break;
                 case S:
-                    currentLocation.Y = mapHeight - Convert.ToInt32(stats.BlueLineDistance * 100);
+                    currentLocation.Y = mapHeight - lerp(currentLocation, new Point(currentLocation.X, Convert.ToInt32(stats.BlueLineDistance * 100))).Y;
                     break;
                 case W:
-                    currentLocation.X = Convert.ToInt32(stats.BlueLineDistance * 100);
+                    currentLocation.X = lerp(currentLocation, new Point(Convert.ToInt32(stats.BlueLineDistance * 100), currentLocation.Y)).X;
                     break;
                 default:
-                    brek;
+                    break;
             }
         }
 
-        private static bool PointInPolygon(Point p, Point[] poly)
+        private static bool PointInView(Point p)
         {
+            Point[] poly = { new Point(currentLocation.X, currentLocation.Y), new Point((currentLocation.X - 69), currentLocation.Y - 150), new Point((currentLocation.X + 69), currentLocation.Y - 150) };
+            //TODO LOGIC CODE HERE
+            //ROTATE TO POSITION
+
             Point p1, p2;
 
             bool inside = false;
@@ -252,10 +277,10 @@ namespace Rovio
                 }
             }
 
-          //  for (int i = 0; i < mapWidth; i++)
-          //  {
-          //      set(i, 120, 1);
-         //   }
+            //  for (int i = 0; i < mapWidth; i++)
+            //  {
+            //      set(i, 120, 1);
+            //   }
 
             //SET THE CURRENT LOCATION %CL
             currentLocation = new Point(100, 200);
@@ -282,8 +307,8 @@ namespace Rovio
         {
             //NEED TO ADD ORIENTATION
             Graphics g = Graphics.FromImage(m);
-          //  Point [] view = {new Point(currentLocation.X,currentLocation.Y), new Point((currentLocation.X-69),currentLocation.Y - 150), new Point((currentLocation.X+69),currentLocation.Y - 150)};
-          //  g.FillPolygon(new SolidBrush(Color.FromArgb(100,Color.Green)), view);
+            Point[] view = { new Point(currentLocation.X, currentLocation.Y), new Point((currentLocation.X - 69), currentLocation.Y - 150), new Point((currentLocation.X + 69), currentLocation.Y - 150) };
+            g.FillPolygon(new SolidBrush(Color.FromArgb(100, Color.Green)), view);
         }
 
         public static double get(Point toGet)
@@ -345,15 +370,15 @@ namespace Rovio
                 return 0.55;
             }
         }
-        
-        public static double probabilisticMap(int x,int y,bool sensor)
+
+        public static double probabilisticMap(int x, int y, bool sensor)
         {
-            double  mapProb = get(x,y);
+            double mapProb = get(x, y);
             bool world = (mapProb < threshold);
 
-            double newProb = (statesProbability(world, sensor) * mapProb) /((statesProbability(world, sensor) * mapProb) + (statesProbability(!world, sensor) * ((1 - mapProb))));
+            double newProb = (statesProbability(world, sensor) * mapProb) / ((statesProbability(world, sensor) * mapProb) + (statesProbability(!world, sensor) * ((1 - mapProb))));
 
-           if ((newProb > 0.05) && (newProb < 0.95))
+            if ((newProb > 0.05) && (newProb < 0.95))
             {
                 set(x, y, newProb);
             }
@@ -364,7 +389,7 @@ namespace Rovio
         {
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.White);
-            
+
             for (int x = 0; x <= mapWidth; ++x)
             {
                 for (int y = 0; y <= mapHeight; ++y)
@@ -445,7 +470,7 @@ namespace Rovio
         private int PXtoCM(double heightAtOneMetre, double blocksHeight, double blockWidth, double blockXLocation)
         {
             double dist = ((heightAtOneMetre / blocksHeight) * 100);
-            
+
             double row = (((blockWidth / 2.0) + (blockXLocation)) / ((imageWidth) / ((dist * 0.92))));
 
             if (((blockWidth / 2.0) + (blockXLocation)) <= (imageWidth / 2))
@@ -459,7 +484,7 @@ namespace Rovio
             return (int)row;
         }
 
-        private Point calculateGreenBlockLocation(float blockHightAtOneMeter, double blocksCurrentHeight, double blockWidth, double blockXLocation)
+        private static Point calculateBlockLocation(float blockHightAtOneMeter, double blocksCurrentHeight, double blockWidth, double blockXLocation)
         {
             double dist = 1.0f;
             if (blocksCurrentHeight != 0)
@@ -471,7 +496,7 @@ namespace Rovio
             a = ((imageWidth) / a);
             a = (((blockWidth / 2.0) + (blockXLocation)) / a);
             double row = 0;
-            
+
             if (((blockWidth / 2.0) + (blockXLocation)) <= (imageWidth / 2))
             {
                 row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
@@ -493,7 +518,7 @@ namespace Rovio
                 return new Point((int)row, (int)col);
             }
         }
-     
+
         /*
         private void drawRedBlock(Bitmap m)
         {
@@ -546,7 +571,7 @@ namespace Rovio
 
         }
         */
-        
+
         private void drawMapToScreen(System.Drawing.Image image)
         {
             if (Program.mainForm.InvokeRequired)

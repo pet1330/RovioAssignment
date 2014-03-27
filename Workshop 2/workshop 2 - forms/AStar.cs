@@ -13,7 +13,6 @@ namespace Rovio
         private AStarData[,] map;
         double thresh = 0.75;
 
-
         public AStar() 
         {
         path = new LinkedList<Point>();
