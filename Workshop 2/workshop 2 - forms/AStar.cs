@@ -104,10 +104,6 @@ namespace Rovio
                     for (int j = -1; j <= 1; j++)
                     {
 
-
-
-
-
                         if (!(j == 0 && i == 0))
                         {
                             Point checkLoc = new Point(Location.X + j, Location.Y + i);

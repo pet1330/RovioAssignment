@@ -13,9 +13,8 @@ namespace Rovio
     {
         public const int RED = 0;
         public const int GREEN = 1;
-        public const int WHITE = 2;
-        public const int YELLOW = 3;
-        public const int BLUE = 4;
+        public const int YELLOW = 2;
+        public const int BLUE = 3;
 
         //Image adapted from http://www.google.com/images/errors/robot.png   This images was created and belongs to Google
         protected Bitmap ConnectionLost = global::Rovio.Properties.Resources.ConnectionLost;
@@ -56,8 +55,8 @@ namespace Rovio
         {
             HSLFiltering filt = new HSLFiltering();
             filt.FillOutsideRange = true;
-            FilteredImage = new Bitmap[5];
-            for (int i = RED; i <= BLUE; i++)
+            FilteredImage = new Bitmap[4];
+            for (int i = 0; i < 4; i++)
             {
                 switch (i)
                 {
@@ -65,80 +64,59 @@ namespace Rovio
                         filt.Hue = new IntRange(345, 15);
                         filt.Saturation = new Range(0.4f, 1.0f);
                         filt.Luminance = new Range(0.15f, 1.0f);
+                        FilteredImage[RED] = filt.Apply(image);
                         break;
                     case GREEN:
                         filt.Hue = new IntRange(90, 115);
                         filt.Saturation = new Range(0.3f, 1.0f);
                         filt.Luminance = new Range(0.15f, 0.9f);
-                        break;
-                    case WHITE:
-                        filt.Hue = new IntRange(181, 180);
-                        filt.Saturation = new Range(0.0f, 0.7f);
-                        filt.Luminance = new Range(0.52f, 0.8f);
-                        //61
+                        FilteredImage[GREEN] = filt.Apply(image);
                         break;
                     case YELLOW:
                         filt.Hue = new IntRange(25, 80);
                         filt.Saturation = new Range(0.2f, 0.9f);
                         filt.Luminance = new Range(0.25f, 0.8f);
+                        FilteredImage[YELLOW] = filt.Apply(image);
                         break;
                     case BLUE:
                         filt.Hue = new IntRange(180, 240);
                         filt.Saturation = new Range(0.1f, 1.0f);
                         filt.Luminance = new Range(0.1f, 0.7f);
-                        break;
-                    default:
-                        filt.Hue = new IntRange(0, 359);
-                        filt.Saturation = new Range(0.0f, 1.0f);
-                        filt.Luminance = new Range(0.0f, 1.0f);
+                        FilteredImage[BLUE] = filt.Apply(image);
                         break;
                 }
-                FilteredImage[i] = filt.Apply(image);
             }
-            UpdateVideo(image);
+            //UpdateVideo(image);
             return FilteredImage;
         }
 
         protected void ExtractFeatrures(Bitmap[] filtered)
         {
-            Stats temp;
+            Stats temp = new Stats();
             Stats toMap = new Stats();
 
             temp = ExtractRedFeatures(filtered[RED]);
-            if (temp.RedBlockDetected)
-            {
-                toMap.RedBlockDetected = temp.RedBlockDetected;
-                toMap.RedBlockCenterLocation = temp.RedBlockCenterLocation;
-                toMap.RedBlockDistance = temp.RedBlockDistance;
-                toMap.RedBlockHeight = temp.RedBlockHeight;
-                toMap.RedBlockWidth = temp.RedBlockWidth;
-            }
+            toMap.RedBlockDetected = temp.RedBlockDetected;
+            toMap.RedBlockCenterLocation = temp.RedBlockCenterLocation;
+            toMap.RedBlockDistance = temp.RedBlockDistance;
+            toMap.RedBlockHeight = temp.RedBlockHeight;
+            toMap.RedBlockWidth = temp.RedBlockWidth;
 
             temp = ExtractGreenFeatures(filtered[GREEN]);
-            if (temp.GreenBlockDetected)
-            {
-                toMap.GreenBlockDetected = temp.GreenBlockDetected;
-                toMap.GreenBlockCenterLocation = temp.GreenBlockCenterLocation;
-                toMap.GreenBlockDistance = temp.GreenBlockDistance;
-                toMap.GreenBlockHeight = temp.GreenBlockHeight;
-                toMap.GreenBlockWidth = temp.GreenBlockWidth;
-            }
+            toMap.GreenBlockDetected = temp.GreenBlockDetected;
+            toMap.GreenBlockCenterLocation = temp.GreenBlockCenterLocation;
+            toMap.GreenBlockDistance = temp.GreenBlockDistance;
+            toMap.GreenBlockHeight = temp.GreenBlockHeight;
+            toMap.GreenBlockWidth = temp.GreenBlockWidth;
 
             temp = ExtractYellowFeatures(filtered[YELLOW]);
-            if (temp.YellowWallDetected)
-            {
-                toMap.YellowWallDetected = temp.YellowWallDetected;
-                toMap.IsNorth = temp.IsNorth;
-                toMap.IsSouth = temp.IsSouth;
-            }
+            toMap.YellowWallDetected = temp.YellowWallDetected;
+            toMap.IsNorth = temp.IsNorth;
+            toMap.IsSouth = temp.IsSouth;
 
             temp = ExtractBlueFeatures(filtered[BLUE]);
-
-            if (temp.BlueLineDetected)
-            {
-                toMap.BlueLineDetected = temp.BlueLineDetected;
-                toMap.BlueLineDistance = temp.BlueLineDistance;
-            }
+            toMap.BlueLineDetected = temp.BlueLineDetected;
+            toMap.BlueLineDistance = temp.BlueLineDistance;
 
             Mapping.queue.Add(toMap);
         }
@@ -159,14 +137,19 @@ namespace Rovio
             if ((rects.Length > 0) && (rects[0].Height > 0))
             {
                 biggest = rects[0];
+                redStats.RedBlockDetected = true;
+                redStats.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
+                redStats.RedBlockHeight = biggest.Height;
+                redStats.RedBlockWidth = biggest.Width;
+                redStats.RedBlockDistance = (25.0f / biggest.Height);
+                Console.WriteLine(redStats.RedBlockDistance);
+            }
+            else
+            {
+                redStats.RedBlockDetected = false;
             }
 
-            redStats.RedBlockDetected = true;
-            redStats.RedBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
-            redStats.RedBlockHeight = biggest.Height;
-            redStats.RedBlockWidth = biggest.Width;
-            redStats.RedBlockDistance = (25.0f / biggest.Height);
-            Console.WriteLine(redStats.RedBlockDistance);
+            UpdateVideo(Filtered);
             return redStats;
 
             //string objectString = Math.Round((25.0f / biggest.Height), 2).ToString();
@@ -201,6 +184,7 @@ namespace Rovio
             greenStats.GreenBlockHeight = biggest.Height;
             greenStats.GreenBlockWidth = biggest.Width;
             greenStats.GreenBlockDistance = (130.0f / biggest.Height);
+            //UpdateVideo(Filtered);
             return greenStats;
 
             // User Feedback for debug
@@ -223,6 +207,7 @@ namespace Rovio
             Rectangle[] rects = bc.GetObjectsRectangles();
             Rectangle biggest = new Rectangle(0, 0, 0, 0);
             //Graphics g = Graphics.FromImage(Filtered);
+            //UpdateVideo(Filtered);
 
             if ((rects.Length > 0) && (rects[0].Height > 0))
             {
@@ -246,6 +231,8 @@ namespace Rovio
             Blob[] blobs = bc.GetObjectsInformation();
             blob.AddRange(blobs);
 
+            //UpdateVideo(Filtered);
+
             for (int i = 0; i < blobs.Length; i++)
             {
                 for (int j = 0; j < blobs.Length; j++)
@@ -264,13 +251,13 @@ namespace Rovio
             switch (blob.Count)
             {
                 case 1:
-                    //   Console.WriteLine("North");
+                  //  Console.WriteLine("North");
                     Stats a = new Stats();
                     a.IsNorth = true;
                     a.YellowWallDetected = true;
                     return a;
                 case 2:
-                    // Console.WriteLine("South");
+                  //  Console.WriteLine("South");
                     Stats b = new Stats();
                     b.IsSouth = true;
                     b.YellowWallDetected = true;

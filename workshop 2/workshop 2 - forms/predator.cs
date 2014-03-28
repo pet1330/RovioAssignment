@@ -18,6 +18,7 @@ namespace Rovio
             : base(address, user, password)
         {
         }
+
         public override void runRovio()
         {
             System.Threading.Thread.Sleep(1000);
@@ -38,12 +39,12 @@ namespace Rovio
                     default:
                         break;
                 }
-                if (currentState == STATE.Prey_Caught) {
-                    break; 
+                if (currentState == STATE.Prey_Caught)
+                {
+                    break;
                 }
             }
         }
-
 
         private STATE FIND_PREY()
         {
@@ -54,9 +55,8 @@ namespace Rovio
 
             if (rotation < 360)
             {
-                rotation += 45;
                 rotateRight45();
-                System.Threading.Thread.Sleep(2000);
+                System.Threading.Thread.Sleep(1500);
                 return STATE.FIND_PREY;
             }
             else
@@ -73,9 +73,10 @@ namespace Rovio
                 return STATE.Prey_Caught;
             }
 
-            CenterPrey();
-            while (true)
+
+            while (run)
             {
+                CenterPrey();
                 if (Mapping.PreyCaught())
                 {
                     return STATE.Prey_Caught;
@@ -89,19 +90,20 @@ namespace Rovio
                     return STATE.Prey_Lost;
                 }
             }
+            return STATE.FIND_PREY;
         }
 
         private STATE PREY_LOST()
         {
             if (Mapping.redLostOnLeft())
             {
-                rotation-= 45;
-                rotateLeft45();
+                rotateLeft15();
+                System.Threading.Thread.Sleep(1500);
             }
             else
             {
-                rotation += 45;
-                rotateRight45();
+                rotateRight15();
+                System.Threading.Thread.Sleep(1500);
             }
 
             if (Mapping.redBlockDetected())
@@ -118,24 +120,21 @@ namespace Rovio
         {
             if (Mapping.lastStats.RedBlockCenterLocation.X > 300)
             {
-                rotateRight45();
+                rotateRight15();
                 System.Threading.Thread.Sleep(1000);
             }
 
             if (Mapping.lastStats.RedBlockCenterLocation.X < 50)
             {
-                rotateLeft45();
+                rotateLeft15();
                 System.Threading.Thread.Sleep(1000);
             }
         }
 
         private STATE ChangeLocation()
         {
-
-           
-
             AStar nav = new AStar();
-            nav.FindPath(Mapping.currentLocation,new System.Drawing.Point( Math.Abs(Mapping.currentLocation.Y - 300), Math.Abs(Mapping.currentLocation.Y - 300)));
+            nav.FindPath(Mapping.currentLocation, new System.Drawing.Point(Math.Abs(Mapping.currentLocation.X - 260), Math.Abs(Mapping.currentLocation.Y - 300)));
 
             foreach (System.Drawing.Point n in nav.path)
             {

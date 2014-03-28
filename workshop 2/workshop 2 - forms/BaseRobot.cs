@@ -65,7 +65,7 @@ namespace Rovio
             lock (commandLock)
             {
                 Request("rev.cgi?Cmd=nav&action=18&drive=18&speed=1&angle=3");
-                Mapping.orientation += 45;
+                Mapping.orientation += 48;
             }
             System.Threading.Thread.Sleep(1000);
         }
@@ -75,27 +75,27 @@ namespace Rovio
             lock (commandLock)
             {
                 Request("rev.cgi?Cmd=nav&action=18&drive=17&speed=1&angle=3");
-                Mapping.orientation -= 45;
+                Mapping.orientation -= 48;
             }
             System.Threading.Thread.Sleep(1000);
         }
 
-        public void rotateRight90()
+        public void rotateRight15()
         {
             lock (commandLock)
             {
-                Request("rev.cgi?Cmd=nav&action=18&drive=18&speed=1&angle=7");
-                Mapping.orientation += 90;
+                Request("rev.cgi?Cmd=nav&action=18&drive=18&speed=1&angle=1");
+                Mapping.orientation += 15;
             }
             System.Threading.Thread.Sleep(1000);
         }
 
-        public void rotateLeft90()
+        public void rotateLeft15()
         {
             lock (commandLock)
             {
-                Request("rev.cgi?Cmd=nav&action=18&drive=17&speed=1&angle=7");
-                Mapping.orientation -= 90;
+                Request("rev.cgi?Cmd=nav&action=18&drive=17&speed=1&angle=1");
+                Mapping.orientation -= 15;
             }
             System.Threading.Thread.Sleep(1000);
         }
@@ -104,9 +104,9 @@ namespace Rovio
         {
             lock (commandLock)
             {
-                this.Drive.Forward(1);
+                this.Drive.Forward(6);
             }
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(200);
         }
 
         protected enum STATE
