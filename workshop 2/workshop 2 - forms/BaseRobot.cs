@@ -67,7 +67,7 @@ namespace Rovio
                 Request("rev.cgi?Cmd=nav&action=18&drive=18&speed=1&angle=3");
                 Mapping.orientation += 45;
             }
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(1000);
         }
 
         public void rotateLeft45()
@@ -77,7 +77,7 @@ namespace Rovio
                 Request("rev.cgi?Cmd=nav&action=18&drive=17&speed=1&angle=3");
                 Mapping.orientation -= 45;
             }
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(1000);
         }
 
         public void rotateRight90()
@@ -87,7 +87,7 @@ namespace Rovio
                 Request("rev.cgi?Cmd=nav&action=18&drive=18&speed=1&angle=7");
                 Mapping.orientation += 90;
             }
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(1000);
         }
 
         public void rotateLeft90()
@@ -97,7 +97,7 @@ namespace Rovio
                 Request("rev.cgi?Cmd=nav&action=18&drive=17&speed=1&angle=7");
                 Mapping.orientation -= 90;
             }
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(1000);
         }
 
         public void driveForward()

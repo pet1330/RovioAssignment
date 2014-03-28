@@ -169,7 +169,6 @@ namespace Rovio
             Console.WriteLine(redStats.RedBlockDistance);
             return redStats;
 
-            
             //string objectString = Math.Round((25.0f / biggest.Height), 2).ToString();
             //string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (redStats.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
             //g.DrawRectangle(new Pen(Color.Blue), biggest);

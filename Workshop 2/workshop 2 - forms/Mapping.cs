@@ -7,7 +7,8 @@ using System.Drawing.Imaging;
 using AForge.Imaging.Filters;
 using System.Collections.Concurrent;
 using System.Threading;
-using Xna = Microsoft.Xna.Framework;
+using System.Drawing.Drawing2D;
+//using Xna = Microsoft.Xna.Framework;
 
 namespace Rovio
 {
@@ -24,8 +25,7 @@ namespace Rovio
 
         private static int mapWidth = 260;
         private static int mapHeight = 300;
-        private int cellSize = 10;
-
+        
         public static Stats lastStats = new Stats();
 
         private static double[] mapData = new double[(mapWidth * mapHeight)];
@@ -41,7 +41,7 @@ namespace Rovio
 
         public static bool redBlockDetected()
         {
-            return PointInView(calculateBlockLocation(25.0f, lastStats.RedBlockHeight, lastStats.RedBlockWidth, lastStats.RedBlockCenterLocation.X));
+            return PointInView(calculateBlockPosition(25.0, lastStats.RedBlockHeight, lastStats.RedBlockWidth, lastStats.RedBlockCenterLocation.X));
         }
         
         public static bool PreyCaught()
@@ -68,6 +68,7 @@ namespace Rovio
                 foreach (Stats stats in queue.GetConsumingEnumerable())
                 {
                     lastStats = stats;
+
                     if (stats.RedBlockDetected)
                     {
                         UpdateRedBlock(stats);
@@ -116,31 +117,25 @@ namespace Rovio
             return new Point((int)NewV.X, (int)NewV.Y);
         }
 
+       Point RotateOnPoint(Point toRotate)
+        {
+            Matrix m = new Matrix();
+           
+            m.RotateAt(orientation, currentLocation);
+            // Point to rotate around
+           // m.Translate(currentLocation.X, currentLocation.Y);
+            Point[] aPoint = {toRotate};
+            m.TransformPoints(aPoint);
+            return aPoint[0];
+        }
+
         private void UpdateRedBlock(Stats stats)
         {
             if (stats.RedBlockHeight == 0)
                 return;
 
-            int h = PXtoCM((double)25.0, (double)stats.RedBlockHeight, (double)stats.RedBlockWidth, (double)stats.RedBlockCenterLocation.X);
-
-            int v = (int)(0 - ((25.0 / stats.RedBlockHeight) * 100));
-
-            double realDist = Math.Sqrt(Math.Pow(v, 2) + Math.Pow(h, 2));
-
-            //TEST! DEBUG! TAKE OUT / TEST
-            System.Drawing.Point p = new System.Drawing.Point(h, v);
-            System.Drawing.Drawing2D.Matrix m = new System.Drawing.Drawing2D.Matrix();
-            m.RotateAt(orientation, new System.Drawing.Point(h, v));
-            // Point to rotate around
-            m.Translate(currentLocation.X, currentLocation.Y);
-            System.Drawing.Point[] aPoints = { p };
-            m.TransformPoints(aPoints);
-            h = aPoints[0].X;
-            v = aPoints[0].Y;
-
-            Point newLocation = RotateLocation(new Point(h, v));
-
-            redLocation = new Point(newLocation.X, newLocation.Y);
+            Point p = calculateBlockPosition(25.0,(double)stats.RedBlockHeight, (double)stats.RedBlockWidth, (double)stats.RedBlockCenterLocation.X);
+            Point newLocation = RotateOnPoint(p);
 
             for (int i = -3; i < 4; i++)
             {
@@ -149,29 +144,11 @@ namespace Rovio
                     probabilisticMap((newLocation.X + currentLocation.X), (newLocation.Y + currentLocation.Y), true);
                 }
             }
-            //DrawRedBlock((newLocation.X + currentLocation.X), (newLocation.Y + currentLocation.Y));
         }
 
         private void UpdateGreenBlock(Stats stats)
         {
-            if (stats.GreenBlockHeight == 0)
-                return;
-
-            int h = PXtoCM((double)130.0, (double)stats.GreenBlockHeight, (double)stats.GreenBlockWidth, (double)stats.GreenBlockCenterLocation.X);
-
-            int v = (int)(0 - ((130.0 / stats.GreenBlockHeight) * 100));
-
-            double realDist = Math.Sqrt(Math.Pow(v, 2) + Math.Pow(h, 2));
-
-            Point newLocation = RotateLocation(new Point(h, v));
-
-            for (int i = -17; i < 17; i++)
-            {   
-                for (int j = -17; j < 17; j++)
-                {
-                    probabilisticMap((newLocation.X + currentLocation.X + i), (newLocation.Y + currentLocation.Y + j), true);
-                }   
-            }
+          
         }
 
         private void UpdateYellowWall(Stats stats)
@@ -447,6 +424,7 @@ namespace Rovio
 
         private void drawGrid(Bitmap m)
         {
+            int cellSize = 10;
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.Black);
             for (int y = 0; y <= (mapHeight / cellSize); ++y)
@@ -460,14 +438,37 @@ namespace Rovio
             }
         }
 
-        private Point RotateLocation(Point old)
+        private static Point calculateBlockPosition(double HeightAtOneMetre, double blocksCurrentHeight,double blockWidth,double blockCentreLocationX)
         {
-            double rotatedX = (old.X * cos(360 - orientation)) + (old.Y * sin(360 - orientation));
-            double rotatedY = (-old.X * sin(360 - orientation)) + old.Y * cos(360 - orientation);
-            Point toReturn = new Point(Convert.ToInt32(rotatedX), Convert.ToInt32(rotatedY));
-            return toReturn;
-        }
+            double dist = 1.0;
 
+            if (blocksCurrentHeight != 0)
+            {
+                dist = ((HeightAtOneMetre / blocksCurrentHeight) * 100.0);
+            }
+
+            double a = ((dist * 0.92));
+            a = ((imageWidth) / a);
+            a = (blockCentreLocationX / a);
+
+            double row = 0;
+
+            if (blockCentreLocationX <= (imageWidth / 2))
+            {
+                row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
+            }
+            else
+            {
+                row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
+            }
+
+            double col = (currentLocation.Y - dist);
+            if (double.IsNaN(row) || double.IsNaN(col))
+                return new Point(-1,-1);
+            else
+            return new Point(Convert.ToInt32(row), Convert.ToInt32(col));
+        }
+        /*
         private int PXtoCM(double heightAtOneMetre, double blocksHeight, double blockWidth, double blockXLocation)
         {
             double dist = ((heightAtOneMetre / blocksHeight) * 100);
@@ -484,40 +485,7 @@ namespace Rovio
             }
             return (int)row;
         }
-
-        private static Point calculateBlockLocation(float blockHightAtOneMeter, double blocksCurrentHeight, double blockWidth, double blockXLocation)
-        {
-            double dist = 1.0;
-            if (blocksCurrentHeight != 0)
-            {
-                dist = ((blockHightAtOneMeter / blocksCurrentHeight) * 100);
-            }
-
-            double a = (dist * 0.92);
-            a = ((imageWidth) / a);
-            a = (((blockWidth / 2.0) + (blockXLocation)) / a);
-            double row = 0;
-            if (((blockWidth / 2.0) + (blockXLocation)) <= (imageWidth / 2))
-            {
-                row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
-            }
-            else
-            {
-                row = (currentLocation.X + (((dist * 0.92) / 2.0) - ((dist * 0.92) - a)));
-            }
-
-            double realDist = Math.Sqrt(Math.Pow(dist, 2) + Math.Pow(a, 2));
-
-            double col = (currentLocation.Y - realDist);
-            if (double.IsNaN(row) || double.IsNaN(col))
-            {
-                return new Point(-1, -1);
-            }
-            else
-            {
-                return new Point((int)row, (int)col);
-            }
-        }
+        */
 
         /*
         private void drawRedBlock(Bitmap m)
