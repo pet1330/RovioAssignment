@@ -20,8 +20,10 @@ namespace Rovio
         }
         public override void runRovio()
         {
+            System.Threading.Thread.Sleep(1000);
             while (run)
             {
+
                 switch (currentState)
                 {
                     case STATE.FIND_PREY:
@@ -36,7 +38,9 @@ namespace Rovio
                     default:
                         break;
                 }
-                if (currentState == STATE.Prey_Caught) { break; }
+                if (currentState == STATE.Prey_Caught) {
+                    break; 
+                }
             }
         }
 
@@ -52,7 +56,7 @@ namespace Rovio
             {
                 rotation += 45;
                 rotateRight45();
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(2000);
                 return STATE.FIND_PREY;
             }
             else
@@ -69,7 +73,7 @@ namespace Rovio
                 return STATE.Prey_Caught;
             }
 
-            
+            CenterPrey();
             while (true)
             {
                 if (Mapping.PreyCaught())
@@ -78,7 +82,6 @@ namespace Rovio
                 }
                 else if (Mapping.redBlockDetected())
                 {
-                    CenterPrey();
                     driveForward();
                 }
                 else
@@ -113,14 +116,16 @@ namespace Rovio
 
         private void CenterPrey()
         {
-            if (Mapping.lastStats.RedBlockCenterLocation.X > 276)
+            if (Mapping.lastStats.RedBlockCenterLocation.X > 300)
             {
                 rotateRight45();
+                System.Threading.Thread.Sleep(1000);
             }
 
-            if (Mapping.lastStats.RedBlockCenterLocation.X < 176)
+            if (Mapping.lastStats.RedBlockCenterLocation.X < 50)
             {
                 rotateLeft45();
+                System.Threading.Thread.Sleep(1000);
             }
         }
 
@@ -134,7 +139,7 @@ namespace Rovio
 
             foreach (System.Drawing.Point n in nav.path)
             {
-
+                Mapping.set(n, 1);
 
             }
             return STATE.FIND_PREY;

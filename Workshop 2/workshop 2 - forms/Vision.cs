@@ -166,6 +166,7 @@ namespace Rovio
             redStats.RedBlockHeight = biggest.Height;
             redStats.RedBlockWidth = biggest.Width;
             redStats.RedBlockDistance = (25.0f / biggest.Height);
+            Console.WriteLine(redStats.RedBlockDistance);
             return redStats;
 
             

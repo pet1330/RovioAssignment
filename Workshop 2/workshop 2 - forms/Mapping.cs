@@ -67,6 +67,7 @@ namespace Rovio
             {
                 foreach (Stats stats in queue.GetConsumingEnumerable())
                 {
+                    lastStats = stats;
                     if (stats.RedBlockDetected)
                     {
                         UpdateRedBlock(stats);
@@ -486,17 +487,16 @@ namespace Rovio
 
         private static Point calculateBlockLocation(float blockHightAtOneMeter, double blocksCurrentHeight, double blockWidth, double blockXLocation)
         {
-            double dist = 1.0f;
+            double dist = 1.0;
             if (blocksCurrentHeight != 0)
             {
                 dist = ((blockHightAtOneMeter / blocksCurrentHeight) * 100);
             }
 
-            double a = ((dist * 0.92));
+            double a = (dist * 0.92);
             a = ((imageWidth) / a);
             a = (((blockWidth / 2.0) + (blockXLocation)) / a);
             double row = 0;
-
             if (((blockWidth / 2.0) + (blockXLocation)) <= (imageWidth / 2))
             {
                 row = (currentLocation.X - (((dist * 0.92) / 2.0) - a));
@@ -508,7 +508,7 @@ namespace Rovio
 
             double realDist = Math.Sqrt(Math.Pow(dist, 2) + Math.Pow(a, 2));
 
-            double col = (currentLocation.Y - dist);
+            double col = (currentLocation.Y - realDist);
             if (double.IsNaN(row) || double.IsNaN(col))
             {
                 return new Point(-1, -1);
