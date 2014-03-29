@@ -25,8 +25,8 @@ namespace Rovio
 
         private static int mapWidth = 260;
         private static int mapHeight = 300;
-        
-       public static Stats lastStats = new Stats();
+
+        public static Stats lastStats = new Stats();
 
         private static double[] mapData = new double[(mapWidth * mapHeight)];
         private static Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
@@ -36,7 +36,7 @@ namespace Rovio
         public static int orientation;
         public static double threshold = 1;
 
-        public static BlockingCollection<Rovio.Stats> queue = new BlockingCollection<Rovio.Stats>(1);
+        public static BlockingCollection<Rovio.Stats> queue = new BlockingCollection<Rovio.Stats>(2);
 
         public static bool redBlockDetected()
         {
@@ -46,7 +46,12 @@ namespace Rovio
             else
                 return false;
         }
-        
+
+        public static bool greenBlockDetected()
+        {
+            return lastStats.GreenBlockDetected;
+        }
+
         public static bool PreyCaught()
         {
             return (lastStats.RedBlockHeight > 90);
@@ -93,14 +98,46 @@ namespace Rovio
                     {
                         for (int j = 0; j < mapHeight; j++)
                         {
-                            if (PointInView(new Point(j, i)))
+                            if (PointInView(new Point(i,j)))
                             {
-                                probabilisticMap(j, i, false);
+                                probabilisticMap(i,j, false);
                             }
                         }
                     }
                 }
             }
+        }
+
+        private static bool occupide(int x, int y)
+        {
+            Point r = calculateBlockPosition(25.0, (double)Mapping.lastStats.RedBlockHeight, (double)Mapping.lastStats.RedBlockWidth, (double)Mapping.lastStats.RedBlockCenterLocation.X);
+
+            for (int i = -3; i < 4; i++)
+            {
+                for (int j = -3; j < 4; j++)
+                {
+                    if (((r.Y + j) == y) && ((r.X + i) == x))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            Point p = calculateBlockPosition(130.0, (double)Mapping.lastStats.GreenBlockHeight, (double)Mapping.lastStats.GreenBlockWidth, (double)Mapping.lastStats.GreenBlockCenterLocation.X);
+            Point newLocation = RotateOnPoint(p);
+
+            for (int i = -15; i < 15; i++)
+            {
+                for (int j = -15; j < 15; j++)
+                {
+                    if (((r.Y + j) == y) && ((r.X + i) == x))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return true;
         }
 
         public Point lerp(Point oldP, Point newP)
@@ -111,21 +148,30 @@ namespace Rovio
             return new Point((int)NewV.X, (int)NewV.Y);
         }
 
-       static Point RotateOnPoint(Point toRotate)
+        static Point RotateOnPoint(Point toRotate)
         {
             Matrix m = new Matrix();
             m.RotateAt(orientation, currentLocation);
-            //m.Translate(currentLocation.X, currentLocation.Y);
             Point[] aPoint = { toRotate };
             m.TransformPoints(aPoint);
             return aPoint[0];
         }
 
-       static Point[] RotateOnPoint(Point[] toRotate)
+        public static void TranslateLocationLeft(int x)
         {
             Matrix m = new Matrix();
             m.RotateAt(orientation, currentLocation);
-            //m.Translate(currentLocation.X, currentLocation.Y);
+            m.Translate(x, 0);
+            Point[] aPoint = { currentLocation };
+            m.TransformPoints(aPoint);
+            currentLocation = aPoint[0];
+        }
+
+        static Point[] RotateOnPoint(Point[] toRotate)
+        {
+            Matrix m = new Matrix();
+            m.RotateAt(orientation, currentLocation);
+            //m.Translate(-50,0);
             m.TransformPoints(toRotate);
             return toRotate;
         }
@@ -136,33 +182,32 @@ namespace Rovio
                 return;
 
             Point p = calculateBlockPosition(25.0, (double)stats.RedBlockHeight, (double)stats.RedBlockWidth, (double)stats.RedBlockCenterLocation.X);
-            Point newLocation = p;
+            Point newLocation = RotateOnPoint(p);
 
             for (int i = -3; i < 4; i++)
             {
                 for (int j = -3; j < 4; j++)
                 {
-                    probabilisticMap((newLocation.X + currentLocation.X),(newLocation.Y + currentLocation.Y), true);
+                    probabilisticMap(newLocation.X + i, newLocation.Y + j, true);
                 }
             }
         }
 
         private void UpdateGreenBlock(Stats stats)
         {
-            if(stats.GreenBlockHeight==0)
+            if (stats.GreenBlockHeight == 0)
                 return;
 
-            Point p = calculateBlockPosition(130.0, (double)stats.RedBlockHeight, (double)stats.RedBlockWidth, (double)stats.RedBlockCenterLocation.X);
+            Point p = calculateBlockPosition(130.0, (double)stats.GreenBlockHeight, (double)stats.GreenBlockWidth, (double)stats.GreenBlockCenterLocation.X);
             Point newLocation = RotateOnPoint(p);
 
             for (int i = -15; i < 15; i++)
             {
                 for (int j = -15; j < 15; j++)
                 {
-                    probabilisticMap((newLocation.X + currentLocation.X), (newLocation.Y + currentLocation.Y), true);
+                    probabilisticMap(newLocation.X, newLocation.Y, true);
                 }
             }
-
         }
 
         private void UpdateYellowWall(Stats stats)
@@ -170,12 +215,12 @@ namespace Rovio
 
             if (stats.IsNorth)
             {
-              //  orientation = N;
+                //  orientation = N;
             }
 
             if (stats.IsSouth)
             {
-             //   orientation = S;
+                //   orientation = S;
             }
         }
 
@@ -206,6 +251,12 @@ namespace Rovio
         private static bool PointInView(Point p)
         {
             Point[] poly = { new Point(currentLocation.X, currentLocation.Y), new Point((currentLocation.X - 69), currentLocation.Y - 150), new Point((currentLocation.X + 69), currentLocation.Y - 150) };
+            foreach (Point item in poly)
+            {
+                if(item.Y < 0)
+                return false;
+            }
+            
             poly = RotateOnPoint(poly);
 
             Point p1, p2;
@@ -249,27 +300,20 @@ namespace Rovio
 
         public Mapping()
         {
-            for (int i = 0; i < mapHeight; i++)
+            for (int i = 0; i < mapWidth; i++)
             {
-                for (int j = 0; j < mapWidth; j++)
+                for (int j = 0; j < mapHeight; j++)
                 {
                     if (i < 30 || i >= 229)
                     {
                         if (j < 100 || j >= 199)
                         {
-                            mapData[((i * mapWidth) + j)] = 1;
+                            mapData[((i * mapWidth) + j)] = 0.5;
                         }
                     }
                     set(i, j, 0.5);
                 }
             }
-
-            //  for (int i = 0; i < mapWidth; i++)
-            //  {
-            //      set(i, 120, 1);
-            //   }
-
-            //SET THE CURRENT LOCATION %CL
             currentLocation = new Point(100, 200);
             Draw();
         }
@@ -280,9 +324,9 @@ namespace Rovio
             Bitmap map = new Bitmap(260, 300);
             Graphics g = Graphics.FromImage(map);
             annotate(map);
-            drawGrid(map);
+            // drawGrid(map);
             addRovioIcon(map);
-            drawViewTriangle(map);
+            //drawViewTriangle(map);
             drawMapToScreen((Image)map.Clone());
         }
 
@@ -321,11 +365,15 @@ namespace Rovio
 
         public static void set(int x, int y, double input)
         {
-            if (x < 30 || x >= 230)
+            Random ran = new Random();
+            if (x < 0 || y < 0 || x >= mapWidth || y >= mapHeight)
+                return;
+
+            if (x < 30 || x >= 229)
             {
-                if (y < 100 || y >= 200)
+                if (y < 100 || y >= 199)
                 {
-                    return;
+                    mapData[((x * mapWidth) + y)] = 0;  
                 }
             }
             if (input >= 0 && input <= 1)
@@ -373,12 +421,13 @@ namespace Rovio
             Graphics g = Graphics.FromImage(m);
             Pen p = new Pen(Color.White);
 
-            for (int x = 0; x <= mapWidth; ++x)
+            for (int x = 0; x < mapWidth; x++)
             {
-                for (int y = 0; y <= mapHeight; ++y)
+                for (int y = 0; y < mapHeight; y++)
                 {
                     int value = Convert.ToInt32(255 - ((get(x, y) * 255)));
-                    p.Color = Color.FromArgb(value, value, value);
+                    Color c = Color.FromArgb(value, value, value);
+                    p.Color = c;
                     g.DrawRectangle(p, x, y, 1, 1);
                 }
             }
@@ -442,7 +491,7 @@ namespace Rovio
             }
         }
 
-        private static Point calculateBlockPosition(double HeightAtOneMetre, double blocksCurrentHeight,double blockWidth,double blockCentreLocationX)
+        private static Point calculateBlockPosition(double HeightAtOneMetre, double blocksCurrentHeight, double blockWidth, double blockCentreLocationX)
         {
             double dist = 1.0;
 
@@ -468,9 +517,9 @@ namespace Rovio
 
             double col = (currentLocation.Y - dist);
             if (double.IsNaN(row) || double.IsNaN(col))
-                return new Point(-1,-1);
+                return new Point(-1, -1);
             else
-            return new Point(Convert.ToInt32(row), Convert.ToInt32(col));
+                return new Point(Convert.ToInt32(row), Convert.ToInt32(col));
         }
 
         private void drawMapToScreen(System.Drawing.Image image)

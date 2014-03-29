@@ -17,7 +17,7 @@ namespace Rovio
 {
     public partial class MainForm : Form
     {
-        private String[] login = { "http://10.82.0.33/", "user", "password" };
+        private String[] login = { "http://10.82.0.41/", "user", "password" };
         private BaseRobot ron;
         private Mapping map;
         private Vision looker;

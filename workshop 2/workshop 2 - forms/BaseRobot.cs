@@ -100,11 +100,29 @@ namespace Rovio
             System.Threading.Thread.Sleep(1000);
         }
 
+        public void StrightLeft()
+        {
+            lock (commandLock)
+            {
+                Drive.StraightLeft(1);
+            }
+            Mapping.TranslateLocationLeft(-1);
+        }
+
         public void driveForward()
         {
             lock (commandLock)
             {
                 this.Drive.Forward(6);
+            }
+            System.Threading.Thread.Sleep(200);
+        }
+        
+        public void driveBackward()
+        {
+            lock (commandLock)
+            {
+                this.Drive.Backward(6);
             }
             System.Threading.Thread.Sleep(200);
         }

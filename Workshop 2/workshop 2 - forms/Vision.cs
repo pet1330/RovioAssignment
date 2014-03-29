@@ -149,7 +149,7 @@ namespace Rovio
                 redStats.RedBlockDetected = false;
             }
 
-            UpdateVideo(Filtered);
+           // UpdateVideo(Filtered);
             return redStats;
 
             //string objectString = Math.Round((25.0f / biggest.Height), 2).ToString();
@@ -171,20 +171,22 @@ namespace Rovio
             bc.ObjectsOrder = ObjectsOrder.Size;
             bc.ProcessImage(Filtered);
             Rectangle[] rects = bc.GetObjectsRectangles();
-            Rectangle biggest = new Rectangle(0, 0, 0, 0);
-           // Graphics g = Graphics.FromImage(Filtered);
+            // Graphics g = Graphics.FromImage(Filtered);
 
             if ((rects.Length > 0) && (rects[0].Height > 0))
             {
-                biggest = rects[0];
+                greenStats.GreenBlockDetected = true;
+                greenStats.GreenBlockCenterLocation = new System.Drawing.Point(((((rects[0].Width / 2) + rects[0].X))), (rects[0].Y + rects[0].Height / 2));
+                greenStats.GreenBlockHeight = rects[0].Height;
+                greenStats.GreenBlockWidth = rects[0].Width;
+                greenStats.GreenBlockDistance = (130.0f / rects[0].Height);
+            }
+            else
+            {
+                greenStats.GreenBlockDetected = false;
             }
 
-            greenStats.GreenBlockDetected = true;
-            greenStats.GreenBlockCenterLocation = new System.Drawing.Point(((((biggest.Width / 2) + biggest.X))), (biggest.Y + biggest.Height / 2));
-            greenStats.GreenBlockHeight = biggest.Height;
-            greenStats.GreenBlockWidth = biggest.Width;
-            greenStats.GreenBlockDistance = (130.0f / biggest.Height);
-            //UpdateVideo(Filtered);
+            UpdateVideo(Filtered);
             return greenStats;
 
             // User Feedback for debug
@@ -494,8 +496,6 @@ namespace Rovio
             return Filtered;
         }
     */
-
-
 
     }
 }

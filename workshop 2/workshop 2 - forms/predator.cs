@@ -56,6 +56,7 @@ namespace Rovio
             if (rotation < 360)
             {
                 rotateRight45();
+                rotation += 45;
                 System.Threading.Thread.Sleep(1500);
                 return STATE.FIND_PREY;
             }
@@ -133,15 +134,76 @@ namespace Rovio
 
         private STATE ChangeLocation()
         {
-            AStar nav = new AStar();
-            nav.FindPath(Mapping.currentLocation, new System.Drawing.Point(Math.Abs(Mapping.currentLocation.X - 260), Math.Abs(Mapping.currentLocation.Y - 300)));
+            //   AStar nav = new AStar();
+            //  nav.FindPath(Mapping.currentLocation, new System.Drawing.Point(Math.Abs(Mapping.currentLocation.X - 260), Math.Abs(Mapping.currentLocation.Y - 300)));
+            //   foreach (System.Drawing.Point n in nav.path)
+            //   {
+            //       Mapping.set(n, 1);
+            // }
 
-            foreach (System.Drawing.Point n in nav.path)
+            while (true)
             {
-                Mapping.set(n, 1);
+                while (!Mapping.greenBlockDetected())
+                {
+                    rotateRight15();
+                    System.Threading.Thread.Sleep(1000);
+                    if (Mapping.redBlockDetected())
+                        return STATE.CHASE;
+                }
 
+                if (!Mapping.greenBlockDetected())
+                    continue;
+
+                if (Mapping.lastStats.GreenBlockHeight < 250)
+                {
+                    driveForward();
+                    System.Threading.Thread.Sleep(1000);
+                }
+                else if (Mapping.lastStats.GreenBlockHeight > 280)
+                {
+                    driveBackward();
+                    System.Threading.Thread.Sleep(1000);
+                }
+                else
+                {
+                    if (Mapping.lastStats.GreenBlockCenterLocation.X > 300)
+                    {
+                        rotateRight15();
+                        System.Threading.Thread.Sleep(1000);
+                    }
+
+                    if (Mapping.lastStats.GreenBlockCenterLocation.X < 50)
+                    {
+                        rotateLeft15();
+                        System.Threading.Thread.Sleep(1000);
+                    }
+                    break;
+                }
             }
-            return STATE.FIND_PREY;
+
+            for (int i = 0; i < 18; i++)
+            {
+                StrightLeft();
+            }
+            System.Threading.Thread.Sleep(500);
+            for (int i = 0; i < 15; i++)
+            {
+                driveForward();
+            }
+            System.Threading.Thread.Sleep(500);
+
+            rotateRight45();
+            System.Threading.Thread.Sleep(1500);
+
+            if (Mapping.redBlockDetected())
+                return STATE.CHASE;
+
+            System.Threading.Thread.Sleep(1500);
+            rotateRight45();
+
+            if (Mapping.redBlockDetected())
+                return STATE.CHASE;
+            else return STATE.FIND_PREY;
         }
     }
 }
