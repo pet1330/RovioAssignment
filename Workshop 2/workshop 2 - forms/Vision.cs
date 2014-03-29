@@ -132,7 +132,7 @@ namespace Rovio
             bc.ProcessImage(Filtered);
             Rectangle[] rects = bc.GetObjectsRectangles();
             Rectangle biggest = new Rectangle(0, 0, 0, 0);
-           // Graphics g = Graphics.FromImage(Filtered);
+            Graphics g = Graphics.FromImage(Filtered);
 
             if ((rects.Length > 0) && (rects[0].Height > 0))
             {
@@ -149,16 +149,18 @@ namespace Rovio
                 redStats.RedBlockDetected = false;
             }
 
-           // UpdateVideo(Filtered);
-            return redStats;
+           
+            
 
-            //string objectString = Math.Round((25.0f / biggest.Height), 2).ToString();
-            //string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (redStats.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
-            //g.DrawRectangle(new Pen(Color.Blue), biggest);
-            //g.DrawString(objectString, drawFont, Brushes.White, redStats.RedBlockCenterLocation.X, redStats.RedBlockCenterLocation.Y, drawFormat);
-            //g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
+            string objectString = Math.Round((25.0f / biggest.Height), 2).ToString();
+            string drawString = biggest.Height + " <-- Height    Width --> " + biggest.Width + "\n Image Center = " + (redStats.RedBlockCenterLocation.X/* - (Filtered.Width / 2)*/);
+            g.DrawRectangle(new Pen(Color.Blue), biggest);
+            g.DrawString(objectString, drawFont, Brushes.White, redStats.RedBlockCenterLocation.X, redStats.RedBlockCenterLocation.Y, drawFormat);
+            g.DrawString(drawString, drawFont, Brushes.White, x, y, drawFormat);
 
             //return Filtered;
+            UpdateVideo(Filtered);
+            return redStats;
         }
 
         private Stats ExtractGreenFeatures(Bitmap Filtered)
@@ -186,7 +188,7 @@ namespace Rovio
                 greenStats.GreenBlockDetected = false;
             }
 
-            UpdateVideo(Filtered);
+            //UpdateVideo(Filtered);
             return greenStats;
 
             // User Feedback for debug
@@ -207,15 +209,17 @@ namespace Rovio
             bc.ObjectsOrder = ObjectsOrder.Size;
             bc.ProcessImage(Filtered);
             Rectangle[] rects = bc.GetObjectsRectangles();
-            Rectangle biggest = new Rectangle(0, 0, 0, 0);
             //Graphics g = Graphics.FromImage(Filtered);
             //UpdateVideo(Filtered);
 
             if ((rects.Length > 0) && (rects[0].Height > 0))
             {
-                biggest = rects[0];
-                blueStats.BlueLineDetected = true;
-                blueStats.BlueLineDistance = (11.0 / biggest.Height);
+               // blueStats.BlueLineDetected = true;
+                blueStats.BlueLineDistance = (11.0 / rects[0].Height);
+            }
+            else
+            {
+                blueStats.BlueLineDetected = false;
             }
             return blueStats;
         }

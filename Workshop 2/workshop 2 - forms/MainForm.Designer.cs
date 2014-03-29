@@ -114,7 +114,7 @@
             this.MaximumSize = new System.Drawing.Size(657, 373);
             this.MinimumSize = new System.Drawing.Size(657, 373);
             this.Name = "MainForm";
-            this.Text = "MainForm";
+            this.Text = "Rovio";
             this.Load += new System.EventHandler(this.MainForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.MapViewer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.VideoViewer)).EndInit();

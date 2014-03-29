@@ -28,7 +28,7 @@ namespace Rovio
 
         public static Stats lastStats = new Stats();
 
-        private static double[] mapData = new double[(mapWidth * mapHeight)];
+        private static double[,] mapData = new double[mapWidth , mapHeight];
         private static Bitmap robotIcon = global::Rovio.Properties.Resources.TinyRobot;
 
         public static double imageWidth = 352;
@@ -100,7 +100,9 @@ namespace Rovio
                         {
                             if (PointInView(new Point(i,j)))
                             {
-                                probabilisticMap(i,j, false);
+                                Point ro = new Point(i, j);
+                                ro = RotateOnPoint(ro);
+                                probabilisticMap(ro.X, ro.Y, occupide(i, j));
                             }
                         }
                     }
@@ -116,7 +118,7 @@ namespace Rovio
             {
                 for (int j = -3; j < 4; j++)
                 {
-                    if (((r.Y + j) == y) && ((r.X + i) == x))
+                    if (((r.X + i) == x) && ((r.Y + j) == y))
                     {
                         return true;
                     }
@@ -130,21 +132,21 @@ namespace Rovio
             {
                 for (int j = -15; j < 15; j++)
                 {
-                    if (((r.Y + j) == y) && ((r.X + i) == x))
+                    if (((p.X + i) == x) && ((p.Y + j) == y))
                     {
                         return true;
                     }
                 }
             }
 
-            return true;
+            return false;
         }
 
         public Point lerp(Point oldP, Point newP)
         {
             Xna.Vector2 OldV = new Xna.Vector2((float)oldP.X, (float)oldP.Y);
             Xna.Vector2 NewV = new Xna.Vector2((float)newP.X, (float)newP.Y);
-            NewV = Xna.Vector2.Lerp(OldV, NewV, 0.1f);
+            NewV = Xna.Vector2.Lerp(OldV, NewV, 0.3f);
             return new Point((int)NewV.X, (int)NewV.Y);
         }
 
@@ -251,11 +253,6 @@ namespace Rovio
         private static bool PointInView(Point p)
         {
             Point[] poly = { new Point(currentLocation.X, currentLocation.Y), new Point((currentLocation.X - 69), currentLocation.Y - 150), new Point((currentLocation.X + 69), currentLocation.Y - 150) };
-            foreach (Point item in poly)
-            {
-                if(item.Y < 0)
-                return false;
-            }
             
             poly = RotateOnPoint(poly);
 
@@ -308,7 +305,7 @@ namespace Rovio
                     {
                         if (j < 100 || j >= 199)
                         {
-                            mapData[((i * mapWidth) + j)] = 0.5;
+                            mapData[i,j] = 0.5;
                         }
                     }
                     set(i, j, 0.5);
@@ -326,7 +323,7 @@ namespace Rovio
             annotate(map);
             // drawGrid(map);
             addRovioIcon(map);
-            //drawViewTriangle(map);
+            drawViewTriangle(map);
             drawMapToScreen((Image)map.Clone());
         }
 
@@ -335,7 +332,7 @@ namespace Rovio
             Graphics g = Graphics.FromImage(m);
             Point[] view = { new Point(currentLocation.X, currentLocation.Y), new Point((currentLocation.X - 69), currentLocation.Y - 150), new Point((currentLocation.X + 69), currentLocation.Y - 150) };
             view = RotateOnPoint(view);
-            g.FillPolygon(new SolidBrush(Color.FromArgb(100, Color.Green)), view);
+            g.FillPolygon(new SolidBrush(Color.FromArgb(100, Color.OrangeRed)), view);
         }
 
         public static double get(Point toGet)
@@ -360,7 +357,7 @@ namespace Rovio
                     return 1;
                 }
             }
-            return mapData[((x * mapWidth) + y)];
+            return mapData[x,y];
         }
 
         public static void set(int x, int y, double input)
@@ -373,12 +370,12 @@ namespace Rovio
             {
                 if (y < 100 || y >= 199)
                 {
-                    mapData[((x * mapWidth) + y)] = 0;  
+                    mapData[x,y] = 0;  
                 }
             }
             if (input >= 0 && input <= 1)
             {
-                mapData[((x * mapWidth) + y)] = input;
+                mapData[x,y] = input;
             }
         }
 
